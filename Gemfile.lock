@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    byebug (11.0.1)
+    pg (1.2.0)
+    sequel (5.27.0)
+    thor (1.0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  byebug
+  pg
+  sequel
+  thor
+
+BUNDLED WITH
+   1.17.2

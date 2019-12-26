@@ -1,0 +1,11 @@
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+  - migrations/**/*.rb
+
+Metrics/MethodLength:
+  Exclude:
+  - app/fanalyze.rb
+
+Style/IfUnlessModifier:
+  Enabled: false
