@@ -2,71 +2,82 @@
 
 require 'yaml'
 require 'byebug'
-
-REPO_CONFIG_PATH = File.join(File.dirname(__FILE__), '..', 'repo')
-REPO_CONFIG = YAML.load_file(
-  File.join(REPO_CONFIG_PATH, 'config.yml')
-)
+require_relative './database_proxy'
 
 # Main entry to analyzer
 class Fanalyze < Thor
-  desc 'create_repo REPO', 'create a new transactions repository of name REPO'
+  desc 'create_db', 'create a new transactions database'
   option(
     :force,
     type: :boolean,
     aliases: :f,
-    desc: 'Force the creation. WARNING: will destroy previous repo!'
+    desc: 'Force the creation. WARNING: will destroy previous database!'
   )
-  def create_repo(repo)
-    if check_repo(repo)
-      unless options[:force]
-        puts "Cannot create #{repo} as it already exists!"
-        puts 'If you want to drop the repo and recreate, use the -f flag'
-        return
-      end
-    end
-    db.execute "DROP DATABASE IF EXISTS #{repo}" if options[:force]
-    db.execute "CREATE DATABASE #{repo}"
+  option(
+    :migrate,
+    type: :boolean,
+    aliases: :m,
+    desc: 'Create with migrations run after database created.'
+  )
+  option(
+    :database,
+    type: :string,
+    aliases: :d,
+    desc: 'Override the name of the database in the config.'
+  )
+  def create_db
+    proxy.create_database(options)
+    return unless options[:migrate]
+
+    proxy.run_migrations
   end
 
-  desc 'check REPO', 'check REPO state.'
+  desc 'check', 'check state of database in config.'
   option(
     :migrated,
     type: :boolean,
     aliases: :m,
     desc: 'Check if migrated to latest schema.'
   )
-  def check(repo)
-    check_repo(repo, options)
+  option(
+    :database,
+    type: :string,
+    aliases: :d,
+    desc: 'Override the name of the database to check from the config.'
+  )
+  def check
+    puts('Database exists.') if proxy.check_db(options)
+  end
+
+  desc 'migrate', 'run migrations on database'
+  option(
+    :database,
+    type: :string,
+    aliases: :d,
+    desc: 'Override the name of the database to migrate from the config.'
+  )
+  def migrate
+    unless proxy.check_db(options)
+      puts 'Cannot run migrations on a non-existent database.'
+      puts "Run `create_db #{db_name_from_options}` first or \
+            `create_db #{db_name_from_options} -m` to create with migrations."
+    end
+    proxy.run_migrations
   end
 
   private
 
-  def db
-    @db ||= Sequel.postgres(REPO_CONFIG.merge('database' => 'postgres'))
+  def postgres_db
+    @postgres_db ||= Sequel.postgres(DB_CONFIG.merge('database' => 'postgres'))
   end
 
-  def check_repo(repo, opts)
-    output = db[
-      'SELECT 1 where EXISTS(
-        select datname from pg_catalog.pg_database
-        where lower(datname) = lower(?)
-      );',
-      repo
-    ]
-    if output.first.nil?
-      puts 'Repo does not exist'
-      return false
+  def db_name_from_options
+    @db_name_from_options ||= begin
+      options[:database] || DB_CONFIG['fanalyzer']['database']
     end
-    result = true
-    if opts[:migrated]
-      Sequel.extension :migration
-      result = Sequel::Migrator.is_current?(
-        db, File.join(REPO_CONFIG_PATH, 'migrations/')
-      )
-      puts 'Repo not migrated to latest' unless result
-    end
+  end
 
-    result
+  def proxy
+    @proxy ||= DatabaseProxy.new(db_name_from_options, postgres_db)
   end
 end
