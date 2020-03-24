@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
-DB_CONFIG_PATH = File.join(File.dirname(__FILE__), '..', 'db')
-DB_CONFIG = YAML.load_file(
-  File.join(DB_CONFIG_PATH, 'config.yml')
-)
+require_relative 'constants'
 
 # Proxy object for a given database
 class DatabaseProxy
   attr_reader :db_name, :postgres_db
 
-  def initialize(db_name, postgres_db)
+  def initialize(db_name, type)
     @db_name = db_name
-    @postgres_db = postgres_db
+    @type = type
+    @connection = if type == 'sqlite'
+                    DatabaseConnections::Sqlite.new(db_name)
+                  else
+                    DatabaseConnections::Postgres.new(db_name)
+                  end
   end
 
   def create_database(options)
@@ -20,8 +22,7 @@ class DatabaseProxy
       puts 'If you want to drop the database and recreate, use the -f flag'
       return
     end
-    postgres_db.execute("DROP DATABASE IF EXISTS #{db_name}") if options[:force]
-    postgres_db.execute "CREATE DATABASE #{db_name}"
+    conn.create!
   end
 
   def check_db(opts = {})
@@ -51,23 +52,7 @@ class DatabaseProxy
     result
   end
 
-  private
-
-  def conn
-    @conn ||= begin
-      config = db_name ? DB_CONFIG.merge('database' => db_name) : DB_CONFIG
-      Sequel.postgres(config)
-    end
-  end
-
-  def db_exists?
-    out = postgres_db[
-      'SELECT 1 where EXISTS(
-        select datname from pg_catalog.pg_database
-        where lower(datname) = lower(?)
-      );',
-      db_name
-    ]
-    !out.first.nil?
-  end
+  delegate :create!, to: :connection
+  delegate :conn, to: :connection
+  delegate :db_exists?, to: :connection
 end

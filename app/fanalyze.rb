@@ -25,6 +25,13 @@ class Fanalyze < Thor
     aliases: :d,
     desc: 'Override the name of the database in the config.'
   )
+  option(
+    :type,
+    type: :string,
+    aliases: :t,
+    desc: 'Choose database type. Choices are sqlite|postrgesql. \
+    Defaults to sqlite.'
+  )
   def create_db
     proxy.create_database(options)
     return unless options[:migrate]
@@ -67,10 +74,6 @@ class Fanalyze < Thor
 
   private
 
-  def postgres_db
-    @postgres_db ||= Sequel.postgres(DB_CONFIG.merge('database' => 'postgres'))
-  end
-
   def db_name_from_options
     @db_name_from_options ||= begin
       options[:database] || DB_CONFIG['fanalyzer']['database']
@@ -78,6 +81,9 @@ class Fanalyze < Thor
   end
 
   def proxy
-    @proxy ||= DatabaseProxy.new(db_name_from_options, postgres_db)
+    @proxy ||= DatabaseProxy.new(
+      db_name_from_options,
+      options.fetch(:type, 'sqlite')
+    )
   end
 end
