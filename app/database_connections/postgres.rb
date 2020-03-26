@@ -7,14 +7,13 @@ require_relative '../constants'
 module DatabaseConnections
   class Postgres < Base
     def create!(opts = {})
-      File.delete(db_name) if File.exist?(db_name) && opts[:force]
-      db_name += '.db' if db_name.split('.').last != '.db'
-      SQLite3::Database.new(db_name)
+      postgres_db.execute("DROP DATABASE IF EXISTS #{@db_name}") if opts[:force]
+      postgres_db.execute "CREATE DATABASE #{@db_name}"
     end
 
     def conn
       @conn = begin
-        config = db_name ? DB_CONFIG.merge('database' => db_name) : DB_CONFIG
+        config = @db_name ? DB_CONFIG.merge('database' => @db_name) : DB_CONFIG
         Sequel.postgres(config)
       end
     end
@@ -25,7 +24,7 @@ module DatabaseConnections
           select datname from pg_catalog.pg_database
           where lower(datname) = lower(?)
         );',
-        db_name
+        @db_name
       ]
       !out.first.nil?
     end

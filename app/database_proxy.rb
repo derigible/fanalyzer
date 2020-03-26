@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/module/delegation'
 require_relative 'constants'
+require_relative 'database_connections/sqlite'
+require_relative 'database_connections/postgres'
 
 # Proxy object for a given database
 class DatabaseProxy
-  attr_reader :db_name, :postgres_db
+  attr_reader :db_name, :connection
 
   def initialize(db_name, type)
     @db_name = db_name
@@ -22,7 +25,7 @@ class DatabaseProxy
       puts 'If you want to drop the database and recreate, use the -f flag'
       return
     end
-    conn.create!
+    connection.create!(options)
   end
 
   def check_db(opts = {})

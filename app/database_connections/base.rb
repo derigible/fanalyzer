@@ -2,8 +2,8 @@
 
 module DatabaseConnections
   class Base
-    def initialize(db_name)
-      @db_name = db_name
+    def initialize(database_name)
+      @db_name = database_name
     end
 
     def create!(_opts)
@@ -17,9 +17,5 @@ module DatabaseConnections
     def db_exists?
       raise 'Must implement db_exists?'
     end
-
-    private
-
-    attr_reader :db_name
   end
 end
