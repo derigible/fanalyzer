@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'yaml'
 require 'byebug'
 require_relative './database_proxy'
+require_relative 'interactive'
 
 # Main entry to analyzer
 class Fanalyze < Thor
@@ -39,7 +39,7 @@ class Fanalyze < Thor
     proxy.run_migrations
   end
 
-  desc 'check', 'check state of database in config.'
+  desc 'check_db', 'check state of database in config.'
   option(
     :migrated,
     type: :boolean,
@@ -56,7 +56,7 @@ class Fanalyze < Thor
     puts('Database exists.') if proxy.check_db(options)
   end
 
-  desc 'migrate', 'run migrations on database'
+  desc 'migrate_db', 'run migrations on database'
   option(
     :database,
     type: :string,
@@ -70,6 +70,11 @@ class Fanalyze < Thor
             `create_db #{db_name_from_options} -m` to create with migrations."
     end
     proxy.run_migrations
+  end
+
+  desc 'interact', 'run the interactive program'
+  def interact
+    Interactive.new(proxy).run!
   end
 
   private

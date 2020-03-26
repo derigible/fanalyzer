@@ -21,3 +21,6 @@ Style/HashTransformValues:
 
 Style/Documentation:
   Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
