@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/module/delegation'
+require 'active_support/core_ext/string/inflections'
+require 'active_support/inflector'
+
 require_relative 'constants'
 require_relative 'database_connections/sqlite'
 require_relative 'database_connections/postgres'
@@ -53,6 +56,12 @@ class DatabaseProxy
     )
     puts('Database not migrated to latest') unless result
     result
+  end
+
+  def model(model)
+    conn
+    require_relative "../db/models/#{model}"
+    "Models::#{model.to_s.camelize}".constantize
   end
 
   delegate :create!, to: :connection

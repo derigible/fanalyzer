@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tty-prompt'
+require_relative 'interactions/upload_csv'
 
 class Interactive
   attr_reader :prompt, :db_proxy
@@ -13,8 +14,8 @@ class Interactive
     result = prompt.select('What would you like to do?') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Query a Database', value: 1
-      menu.choice name: 'Upload to a Database', value: 2
+      menu.choice name: 'Query Database', value: 1
+      menu.choice name: 'Upload CSV to Database', value: 2
     end
     send("run_#{result}".to_s)
   end
@@ -22,13 +23,16 @@ class Interactive
   private
 
   def run_1
-    choices = %w[Categories Sources Servicers Transactions]
-    result = prompt.select('Select query option.', choices, enum: '.')
+    result = prompt.select(
+      'Select query option.',
+      %w[Categories Sources Servicers Transactions],
+      enum: '.'
+    )
     puts result
     puts db_proxy.conn.from(result.to_s).all.count
   end
 
   def run_2
-    puts 'path not implemented yet'
+    Interactions::UploadCsv.new(db_proxy, prompt).run!
   end
 end
