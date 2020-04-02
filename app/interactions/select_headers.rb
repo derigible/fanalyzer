@@ -23,7 +23,7 @@ module Interactions
     def headers
       @headers ||= begin
         normalize(display_saved_headings.values) || gather_headings
-      end.invert
+      end
     end
 
     private

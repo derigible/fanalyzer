@@ -3,6 +3,7 @@
 require 'csv'
 require 'tty-prompt'
 require_relative 'select_headers'
+require_relative '../uploaders/transactions'
 
 module Interactions
   class UploadCsv
@@ -16,7 +17,8 @@ module Interactions
     def run!
       headers = select_headers.run!
       paths = file_path_history.readlines(chomp: true)
-      load_csv select_file(paths), headers
+      date_format = date_format
+      load_csv select_file(paths), headers, date_format
     end
 
     private
@@ -28,11 +30,8 @@ module Interactions
       end
     end
 
-    def load_csv(file, _headers)
-      CSV.open(file, headers: true).each do |r|
-        debugger
-        r
-      end
+    def load_csv(file, headers, date_format)
+      Uploaders::Transactions.new(db_proxy, file, headers, date_format).upload!
     end
 
     def select_headers
@@ -66,6 +65,16 @@ module Interactions
       file_path_history.write(File.realpath(f))
       file_path_history.close
       f
+    end
+
+    def date_format
+      prompt.select('Select format date column is in.') do |menu|
+        menu.enum '.'
+
+        menu.choice name: 'Month/Day/Year (mm/dd/yyyy)', value: '%m/%d/%Y'
+        menu.choice name: 'Day/Month/Year (dd/mm/yyyy)', value: '%d/%m/%Y'
+        menu.choice name: 'Year-Month-Day (yyyy-mm-dd)', value: '%Y-%m-%d'
+      end
     end
   end
 end
