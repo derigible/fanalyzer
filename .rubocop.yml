@@ -4,6 +4,7 @@ Metrics/BlockLength:
   - migrations/**/*.rb
 
 Metrics/MethodLength:
+  Max: 20
   Exclude:
   - app/fanalyze.rb
 
