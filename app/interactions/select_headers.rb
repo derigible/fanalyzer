@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-require 'tty-prompt'
-
 module Interactions
   class SelectHeaders
     CHOICES = %w[date description amount type servicer category].freeze
 
-    attr_reader :prompt, :db_proxy
+    attr_reader :prompt, :db_proxy, :id
 
     def initialize(database_proxy, tty_prompt)
       @db_proxy = database_proxy
@@ -22,7 +20,7 @@ module Interactions
     # mapping for the description column looks
     def headers
       @headers ||= begin
-        normalize(display_saved_headings.values) || gather_headings
+        normalize(display_saved_headings&.values) || gather_headings
       end
     end
 
@@ -33,6 +31,9 @@ module Interactions
     end
 
     def normalize(hsh)
+      return if hsh.nil?
+
+      @id = hsh[:id]
       hsh.delete(:name)
       hsh.delete(:id)
       hsh
@@ -77,13 +78,15 @@ module Interactions
           "What is the heading for #{c.capitalize} (Leave empty if same)?"
         ) || c
       end
-      puts 'This is what you have selected:'
-      CHOICES.each_with_index { |c, i| puts "#{c} => #{results[i]}" }
+      puts(
+        'This is what you have selected (Note: headers used as lowercase):'
+      )
+      CHOICES.each_with_index { |c, i| puts "#{c} => #{results[i].downcase}" }
       results
     end
 
     def create_mapping(results)
-      CHOICES.zip(results).to_h
+      CHOICES.zip(results).to_h.transform_values(&:downcase)
     end
   end
 end
