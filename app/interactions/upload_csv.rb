@@ -4,7 +4,7 @@ require 'csv'
 require_relative 'select_headers'
 require_relative 'select_file'
 require_relative 'select_date_format'
-require_relative '../extractors/transactions'
+require_relative '../extractors/financial/csv'
 require_relative '../uploaders/transactions'
 
 module Interactions
@@ -20,15 +20,15 @@ module Interactions
       header_selector = Interactions::SelectHeaders.new(db_proxy, prompt)
       headers = header_selector.run!
       date_format = select_date_format(header_selector.id)
-      extract_transactions_from_csv(
+      transactions, servicers, categories = extract_financial_data_from_csv(
         select_file, headers, date_format
       )
     end
 
     private
 
-    def extract_transactions_from_csv(file, headers, date_format)
-      Extractors::Transactions.new(file, headers, date_format).extract!
+    def extract_financial_data_from_csv(file, headers, date_format)
+      Extractors::Financial::Csv.new(file, headers, date_format).extract!
     end
 
     def save_transactions(file, headers, date_format)
