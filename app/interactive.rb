@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'tty-prompt'
-require_relative 'interactions/upload_csv'
+require_relative 'uploaders/financial/csv'
 
 class Interactive
   attr_reader :prompt, :db_proxy
@@ -33,6 +33,6 @@ class Interactive
   end
 
   def run_2
-    Interactions::UploadCsv.new(db_proxy, prompt).run!
+    Uploaders::Financial::Csv.new(db_proxy, prompt).run!
   end
 end
