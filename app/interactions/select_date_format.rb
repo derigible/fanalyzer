@@ -2,10 +2,10 @@
 
 module Interactions
   class SelectDateFormat
-    attr_reader :prompt, :db_proxy
+    attr_reader :prompt, :header_mapping
 
-    def initialize(database_proxy, tty_prompt)
-      @db_proxy = database_proxy
+    def initialize(header_mapping, tty_prompt)
+      @header_mapping = header_mapping
       @prompt = tty_prompt
     end
 
@@ -20,10 +20,6 @@ module Interactions
       return if id.nil?
 
       header_mapping[id]&.date_format
-    end
-
-    def header_mapping
-      @header_mapping ||= db_proxy.model(:header_mapping)
     end
 
     def date_format(id)

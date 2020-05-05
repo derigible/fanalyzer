@@ -17,7 +17,9 @@ module Uploaders
       end
 
       def run!
-        header_selector = Interactions::SelectHeaders.new(db_proxy, prompt)
+        header_selector = Interactions::SelectHeaders.new(
+          header_mapping_model, prompt
+        )
         headers = header_selector.run!
         date_format = select_date_format(header_selector.id)
         transactions, servicers, categories = extract_financial_data_from_csv(
@@ -40,7 +42,13 @@ module Uploaders
       end
 
       def select_date_format(headers_id)
-        Interactions::SelectDateFormat.new(db_proxy, prompt).run!(headers_id)
+        Interactions::SelectDateFormat.new(header_mapping_model, prompt).run!(
+          headers_id
+        )
+      end
+
+      def header_mapping_model
+        @header_mapping_model ||= db_proxy.model(:financial_header_mapping)
       end
 
       def transaction_model

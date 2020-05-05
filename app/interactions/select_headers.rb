@@ -4,10 +4,10 @@ module Interactions
   class SelectHeaders
     CHOICES = %w[date description amount type servicer category].freeze
 
-    attr_reader :prompt, :db_proxy, :id
+    attr_reader :prompt, :header_mapping, :id
 
-    def initialize(database_proxy, tty_prompt)
-      @db_proxy = database_proxy
+    def initialize(header_mapping, tty_prompt)
+      @header_mapping = header_mapping
       @prompt = tty_prompt
     end
 
@@ -25,10 +25,6 @@ module Interactions
     end
 
     private
-
-    def header_mapping
-      @header_mapping ||= db_proxy.model(:header_mapping)
-    end
 
     def normalize(hsh)
       return if hsh.nil?

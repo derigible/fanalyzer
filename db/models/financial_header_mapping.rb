@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Models
-  class HeaderMapping < Sequel::Model
+  class FinancialHeaderMapping < Sequel::Model
   end
 end

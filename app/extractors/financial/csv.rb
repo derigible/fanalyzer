@@ -32,7 +32,11 @@ module Extractors
       end
 
       def extract_field(record, field)
-        return Date.strptime(record[headers['date']], d_format) if field == 'date'
+        if field == 'date'
+          return Date.strptime(
+            record[headers['date']], d_format
+          )
+        end
 
         record[headers[field]]
       end

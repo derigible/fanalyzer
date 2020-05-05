@@ -2,7 +2,7 @@
 
 Sequel.migration do
   change do
-    create_table(:header_mappings) do
+    create_table(:financial_header_mappings) do
       primary_key :id
       String :name, text: true
       String :date, text: true

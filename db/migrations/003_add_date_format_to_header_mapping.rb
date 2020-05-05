@@ -2,7 +2,7 @@
 
 Sequel.migration do
   change do
-    alter_table(:header_mappings) do
+    alter_table(:financial_header_mappings) do
       add_column :date_format, String
     end
   end
