@@ -47,7 +47,7 @@ module Uploaders
 
       def update_categories(categories)
         categories.each_value do |c|
-          category = servicer_model[name: c.name]
+          category = category_model[name: c.name]
           if category.nil?
             Interactions::NewCategory.new(c, category_model, prompt).run!
           else
@@ -57,15 +57,35 @@ module Uploaders
       end
 
       def update_transactions(transactions)
-        new_transactions = []
-        transactions.each do |t|
-          next unless transaction_model[
-            date: t.date, amount: t.amount, is_debit: t.is_debit
-          ].nil?
+        new_ts = detect_new_transactions(transactions)
+        return unless new_ts.size.positive?
 
-          new_transactions << t
+        action = prompt.prompt(
+          "There are #{new_ts.size} new transactions. What would you like to do?"
+        ) do |menu|
+          menu.choice 'Save without reviewing', :save
+          menu.choice 'Review each transaction', :review
+        end
+        send(action, new_ts)
+      end
+
+      def save(transactions)
+        transactions.each do |t|
+          next if t.servicer.id == 'remove'
+
+          transaction_model.create(
+            date: t.date,
+            description: t.description,
+            amount: t.amount,
+            is_debit: t.is_debit,
+            category_id: t.category.id,
+            servicer_id: t.servicer.id
+            # TODO: add source_id when sources are introduced
+          )
         end
       end
+
+      def review(transactions); end
 
       def extract_financial_data_from_csv(file, headers, date_format)
         Extractors::Financial::Csv.new(file, headers, date_format).extract!
@@ -83,6 +103,16 @@ module Uploaders
         Interactions::SelectDateFormat.new(header_mapping_model, prompt).run!(
           headers_id
         )
+      end
+
+      def detect_new_transactions(transactions)
+        transactions.each_with_object([]) do |t, new_transactions|
+          next unless transaction_model[
+            date: t.date, amount: t.amount, is_debit: t.is_debit
+          ].nil?
+
+          new_transactions << t
+        end
       end
 
       def header_mapping_model

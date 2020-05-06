@@ -18,7 +18,8 @@ module Interactions
         menu.choice 'Map to a different category permanently', :map_once
         menu.choice 'Map to a different category on this upload', :map_perm
         menu.choice(
-          'Rename category (future categories will map to this name as well)', :rename
+          'Rename category (future categories will map to this name as well)',
+          :rename
         )
       end
 

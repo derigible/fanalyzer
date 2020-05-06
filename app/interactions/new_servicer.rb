@@ -15,7 +15,9 @@ module Interactions
         "New servicer #{s.name}. What would you like to do?"
       ) do |menu|
         menu.choice 'Save', :save
-        menu.choice 'Remove (will remove all transactions on this upload)', :remove
+        menu.choice(
+          'Remove (will remove all transactions on this upload)', :remove
+        )
         menu.choice 'Map to a different servicer permanently', :map_once
         menu.choice 'Map to a different servicer on this upload', :map_perm
         menu.choice(
