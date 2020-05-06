@@ -11,8 +11,8 @@ module Interactions
     end
 
     def run!
-      choice = tty_prompt.select(
-        "New servicer #{s.name}. What would you like to do?"
+      choice = prompt.select(
+        "New servicer #{servicer.name}. What would you like to do?"
       ) do |menu|
         menu.choice 'Save', :save
         menu.choice(

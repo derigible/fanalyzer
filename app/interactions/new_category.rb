@@ -11,7 +11,7 @@ module Interactions
     end
 
     def run!
-      choice = tty_prompt.select(
+      choice = prompt.select(
         "New category #{s.name}. What would you like to do?"
       ) do |menu|
         menu.choice 'Save', :save

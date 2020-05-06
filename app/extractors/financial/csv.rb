@@ -31,7 +31,7 @@ module Extractors
         row = record.to_h.transform_keys(&:downcase)
         t = OpenStruct.new
         headers.each_key do |h|
-          t[h] = extract_field(row, h.to_s)
+          t[h] = extract_field(row, h)
         end
         t.is_debit = t.type.downcase == 'debit'
         t.delete_field 'type'
@@ -41,7 +41,7 @@ module Extractors
       def extract_field(record, field)
         if field == 'date'
           return Date.strptime(
-            record[headers['date']], d_format
+            record[headers[:date]], d_format
           )
         end
 

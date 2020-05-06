@@ -52,7 +52,7 @@ class Fanalyze < Thor
     aliases: :d,
     desc: 'Override the name of the database to check from the config.'
   )
-  def check
+  def check_db
     puts('Database exists.') if proxy.check_db(options)
   end
 
@@ -63,7 +63,7 @@ class Fanalyze < Thor
     aliases: :d,
     desc: 'Override the name of the database to migrate from the config.'
   )
-  def migrate
+  def migrate_db
     unless proxy.check_db(options)
       puts 'Cannot run migrations on a non-existent database.'
       puts "Run `create_db #{db_name_from_options}` first or \
