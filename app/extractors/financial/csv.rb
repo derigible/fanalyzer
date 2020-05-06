@@ -28,7 +28,14 @@ module Extractors
       attr_reader :file, :headers, :d_format
 
       def create_transaction_struct(record)
-        OpenStruct.new record.to_h.transform_keys(&:downcase)
+        row = record.to_h.transform_keys(&:downcase)
+        t = OpenStruct.new
+        headers.each_key do |h|
+          t[h] = extract_field(row, h.to_s)
+        end
+        t.is_debit = t.type.downcase == 'debit'
+        t.delete_field 'type'
+        t
       end
 
       def extract_field(record, field)
