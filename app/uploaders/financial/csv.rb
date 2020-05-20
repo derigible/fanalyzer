@@ -28,7 +28,7 @@ module Uploaders
           select_file, headers, date_format
         )
         update_servicers(servicers)
-        udpate_categories(categories)
+        update_categories(categories)
         update_transactions(transactions)
       end
 
@@ -60,8 +60,8 @@ module Uploaders
         new_ts = detect_new_transactions(transactions)
         return unless new_ts.size.positive?
 
-        action = prompt.prompt(
-          "There are #{new_ts.size} new transactions. What would you like to do?"
+        action = prompt.select(
+          "Found #{new_ts.size} new transactions. What would you like to do?"
         ) do |menu|
           menu.choice 'Save without reviewing', :save
           menu.choice 'Review each transaction', :review

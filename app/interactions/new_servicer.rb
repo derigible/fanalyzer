@@ -59,7 +59,7 @@ module Interactions
     end
 
     def rename
-      new_name = prompt.ask?(
+      new_name = prompt.ask(
         'What should the new name be? (leave blank to select new choice)'
       )
       return run! if new_name == ''
@@ -77,7 +77,7 @@ module Interactions
       servicers = servicer_model.exclude(servicer_id: nil)
       prompt.select('Select servicer to map to') do |menu|
         servicers.each do |s|
-          menu.choice s.name, s.id
+          menu.choice s.name, s
         end
         menu.choice 'None', :none
       end

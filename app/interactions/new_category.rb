@@ -12,7 +12,7 @@ module Interactions
 
     def run!
       choice = prompt.select(
-        "New category #{s.name}. What would you like to do?"
+        "New category #{category.name}. What would you like to do?"
       ) do |menu|
         menu.choice 'Save', :save
         menu.choice 'Map to a different category permanently', :map_once
@@ -57,7 +57,7 @@ module Interactions
     end
 
     def rename
-      new_name = prompt.ask?(
+      new_name = prompt.ask(
         'What should the new name be? (leave blank to select new choice)'
       )
       return run! if new_name == ''
@@ -74,8 +74,8 @@ module Interactions
       # exclude here creates a "category_id IS NOT NULL" clause
       categories = category_model.exclude(category_id: nil)
       prompt.select('Select category to map to') do |menu|
-        categories.each do |s|
-          menu.choice s.name, s.id
+        categories.each do |c|
+          menu.choice c.name, c
         end
         menu.choice 'None', :none
       end

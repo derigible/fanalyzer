@@ -16,7 +16,7 @@ Sequel.migration do
     create_table(:servicers) do
       primary_key :id
       String :name, text: true
-      foreign_key :servicer_id, :servicer, on_delete: :cascade, null: true
+      foreign_key :servicer_id, :servicers, on_delete: :cascade, null: true
     end
 
     create_table(:transactions) do

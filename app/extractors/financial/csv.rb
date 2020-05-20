@@ -54,14 +54,14 @@ module Extractors
       end
 
       def servicer(row)
-        name = extract_field(row, :servicer)
+        name = row[:servicer]
         servicers[name] || begin
           servicers[name] = OpenStruct.new name: name
         end
       end
 
       def category(row)
-        name = extract_field(row, :category)
+        name = row[:category]
         categories[name] || begin
           categories[name] = OpenStruct.new name: name
         end
