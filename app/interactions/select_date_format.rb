@@ -10,7 +10,9 @@ module Interactions
     end
 
     def run!(id)
-      use_stored(id) && return
+      fmt = use_stored(id)
+      return fmt if fmt
+
       date_format(id)
     end
 
@@ -31,7 +33,7 @@ module Interactions
         menu.choice name: 'Year-Month-Day (yyyy-mm-dd)', value: '%Y-%m-%d'
       end
 
-      header_mapping[id]&.update date_format: fmt unless id.nil?
+      header_mapping[id]&.update(date_format: fmt) unless id.nil?
       fmt
     end
   end

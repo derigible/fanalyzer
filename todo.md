@@ -5,4 +5,4 @@ FEATURES
 - [ ] Edit Transaction Metadata
 
 BUGS
-- [ ] Fix date format bug being nil when first defined
+- [x] Fix date format bug being nil when first defined

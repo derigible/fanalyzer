@@ -20,7 +20,7 @@ module Interactions
     # mapping for the description column looks
     def headers
       @headers ||= begin
-        normalize(display_saved_headings&.values) || gather_headings
+        normalize(display_saved_headings&.values || gather_headings)
       end
     end
 
@@ -32,7 +32,7 @@ module Interactions
       @id = hsh[:id]
       hsh.delete(:name)
       hsh.delete(:id)
-      hsh
+      hsh.transform_keys!(&:to_sym)
     end
 
     def display_saved_headings
@@ -64,7 +64,7 @@ module Interactions
         'Name of header mapping (leave blank to not save):'
       )
       mapping = create_mapping(results)
-      header_mapping.create(mapping.merge!(name: name)) if name
+      mapping[:id] = header_mapping.create(mapping.merge!(name: name)).id if name
       mapping
     end
 

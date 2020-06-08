@@ -51,6 +51,8 @@ module Extractors
       def extract_transaction(transaction)
         transaction.servicer = servicer(transaction)
         transaction.category = category(transaction)
+        normalize_transaction_data(transaction)
+        transaction
       end
 
       def servicer(row)
@@ -65,6 +67,10 @@ module Extractors
         categories[name] || begin
           categories[name] = OpenStruct.new name: name
         end
+      end
+
+      def normalize_transaction_data(transaction)
+        transaction.date = extract_field(transaction, 'date')
       end
     end
   end

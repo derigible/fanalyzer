@@ -3,6 +3,7 @@
 require 'csv'
 require_relative '../../interactions/select_headers'
 require_relative '../../interactions/select_file'
+require_relative '../../interactions/select_source'
 require_relative '../../interactions/select_date_format'
 require_relative '../../interactions/new_servicer'
 require_relative '../../interactions/new_category'
@@ -19,6 +20,7 @@ module Uploaders
       end
 
       def run!
+        source = select_source
         header_selector = Interactions::SelectHeaders.new(
           header_mapping_model, prompt
         )
@@ -29,7 +31,7 @@ module Uploaders
         )
         update_servicers(servicers)
         update_categories(categories)
-        update_transactions(transactions)
+        update_transactions(transactions, source)
       end
 
       private
@@ -56,7 +58,7 @@ module Uploaders
         end
       end
 
-      def update_transactions(transactions)
+      def update_transactions(transactions, _source)
         new_ts = detect_new_transactions(transactions)
         return unless new_ts.size.positive?
 
@@ -66,12 +68,15 @@ module Uploaders
           menu.choice 'Save without reviewing', :save
           menu.choice 'Review each transaction', :review
         end
-        send(action, new_ts)
+        send(action, new_ts, source)
       end
 
-      def save(transactions)
+      def save(transactions, _source)
+        count = 1
         transactions.each do |t|
           next if t.servicer.id == 'remove'
+
+          puts "Creating new transaction #{count}"
 
           transaction_model.create(
             date: t.date,
@@ -79,9 +84,10 @@ module Uploaders
             amount: t.amount,
             is_debit: t.is_debit,
             category_id: t.category.id,
-            servicer_id: t.servicer.id
-            # TODO: add source_id when sources are introduced
+            servicer_id: t.servicer.id,
+            source_id: source.id
           )
+          count += 1
         end
       end
 
@@ -97,6 +103,10 @@ module Uploaders
 
       def select_file
         Interactions::SelectFile.new(prompt, 'csv').run!
+      end
+
+      def select_source
+        Interactions::SelectSource.new(prompt, source_model).run!
       end
 
       def select_date_format(headers_id)
@@ -125,6 +135,10 @@ module Uploaders
 
       def servicer_model
         @servicer_model ||= db_proxy.model(:servicer)
+      end
+
+      def source_model
+        @source_model ||= db_proxy.model(:source)
       end
 
       def category_model
