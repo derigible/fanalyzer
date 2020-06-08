@@ -50,7 +50,7 @@ module Uploaders
               s, servicer_model, prompt, upload_id
             ).run!
           else
-            s.id = servicer.id
+            s.id = servicer.mapped_id
           end
         end
       end
@@ -63,7 +63,7 @@ module Uploaders
               c, category_model, prompt, upload_id
             ).run!
           else
-            c.id = category.id
+            c.id = category.mapped_id
           end
         end
       end
@@ -124,7 +124,10 @@ module Uploaders
       end
 
       def detect_new_transactions(transactions)
+        puts
+        print 'Checking if transactions already present'
         transactions.each_with_object([]) do |t, new_transactions|
+          print '.'
           next unless transaction_model[
             date: t.date, amount: t.amount, is_debit: t.is_debit
           ].nil?

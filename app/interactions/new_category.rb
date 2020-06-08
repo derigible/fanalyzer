@@ -51,7 +51,7 @@ module Interactions
       return run! if use == :none
 
       category_model.create(
-        name: category.name, category_id: use.id
+        name: category.name, category_id: use.id, upload_id: upload_id
       )
       category.id = use.id
       category.name = use.name
@@ -83,10 +83,13 @@ module Interactions
     end
 
     def create_and_map(new_name)
-      new_category = category_model.create name: new_name
-      category_model.create name: category.name, category_id: new_category.id
+      new_category = category_model.create name: new_name, upload_id: upload_id
+      category_model.create(
+        name: category.name, category_id: new_category.id, upload_id: upload_id
+      )
       category.id = new_category.id
       category.name = new_name
+      new_category
     end
   end
 end

@@ -53,7 +53,7 @@ module Interactions
       return run! if use == :none
 
       servicer_model.create(
-        name: servicer.name, servicer_id: use.id
+        name: servicer.name, servicer_id: use.id, upload_id: upload_id
       )
       servicer.id = use.id
       servicer.name = use.name
@@ -85,10 +85,13 @@ module Interactions
     end
 
     def create_and_map(new_name)
-      new_servicer = servicer_model.create name: new_name
-      servicer_model.create name: servicer.name, servicer_id: new_servicer.id
+      new_servicer = servicer_model.create name: new_name, upload_id: upload_id
+      servicer_model.create(
+        name: servicer.name, servicer_id: new_servicer.id, upload_id: upload_id
+      )
       servicer.id = new_servicer.id
       servicer.name = new_name
+      new_servicer
     end
   end
 end
