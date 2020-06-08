@@ -2,12 +2,13 @@
 
 module Interactions
   class NewServicer
-    attr_reader :prompt, :servicer_model, :servicer
+    attr_reader :prompt, :servicer_model, :servicer, :upload_id
 
-    def initialize(servicer, servicer_model, tty_prompt)
+    def initialize(servicer, servicer_model, tty_prompt, upload_id)
       @servicer = servicer
       @servicer_model = servicer_model
       @prompt = tty_prompt
+      @upload_id = upload_id
     end
 
     def run!
@@ -31,7 +32,7 @@ module Interactions
     private
 
     def save
-      s = servicer_model.create name: servicer.name
+      s = servicer_model.create name: servicer.name, upload_id: upload_id
       servicer.id = s.id
     end
 

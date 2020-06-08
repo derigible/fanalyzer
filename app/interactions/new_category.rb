@@ -2,12 +2,13 @@
 
 module Interactions
   class NewCategory
-    attr_reader :prompt, :category_model, :category
+    attr_reader :prompt, :category_model, :category, :upload_id
 
-    def initialize(category, category_model, tty_prompt)
+    def initialize(category, category_model, tty_prompt, upload_id)
       @category = category
       @category_model = category_model
       @prompt = tty_prompt
+      @upload_id = upload_id
     end
 
     def run!
@@ -29,7 +30,7 @@ module Interactions
     private
 
     def save
-      s = category_model.create name: category.name
+      s = category_model.create name: category.name, upload_id: upload_id
       category.id = s.id
     end
 

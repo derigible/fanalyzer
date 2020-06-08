@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'csv'
+require 'date'
 require_relative '../../interactions/select_headers'
 require_relative '../../interactions/select_file'
 require_relative '../../interactions/select_source'
@@ -12,7 +13,7 @@ require_relative '../../extractors/financial/csv'
 module Uploaders
   module Financial
     class Csv
-      attr_reader :prompt, :db_proxy
+      attr_reader :prompt, :db_proxy, :upload_id
 
       def initialize(database_proxy, tty_prompt)
         @db_proxy = database_proxy
@@ -20,7 +21,7 @@ module Uploaders
       end
 
       def run!
-        source = select_source
+        upload_id = new_upload
         header_selector = Interactions::SelectHeaders.new(
           header_mapping_model, prompt
         )
@@ -29,36 +30,45 @@ module Uploaders
         transactions, servicers, categories = extract_financial_data_from_csv(
           select_file, headers, date_format
         )
-        update_servicers(servicers)
-        update_categories(categories)
-        update_transactions(transactions, source)
+        update_servicers(servicers, upload_id)
+        update_categories(categories, upload_id)
+        update_transactions(transactions, upload_id)
       end
 
       private
 
-      def update_servicers(servicers)
+      def new_upload
+        source = select_source
+        db_proxy.model(:upload).create(source_id: source.id).id
+      end
+
+      def update_servicers(servicers, upload_id)
         servicers.each_value do |s|
           servicer = servicer_model[name: s.name]
           if servicer.nil?
-            Interactions::NewServicer.new(s, servicer_model, prompt).run!
+            Interactions::NewServicer.new(
+              s, servicer_model, prompt, upload_id
+            ).run!
           else
             s.id = servicer.id
           end
         end
       end
 
-      def update_categories(categories)
+      def update_categories(categories, upload_id)
         categories.each_value do |c|
           category = category_model[name: c.name]
           if category.nil?
-            Interactions::NewCategory.new(c, category_model, prompt).run!
+            Interactions::NewCategory.new(
+              c, category_model, prompt, upload_id
+            ).run!
           else
             c.id = category.id
           end
         end
       end
 
-      def update_transactions(transactions, _source)
+      def update_transactions(transactions, upload_id)
         new_ts = detect_new_transactions(transactions)
         return unless new_ts.size.positive?
 
@@ -68,10 +78,10 @@ module Uploaders
           menu.choice 'Save without reviewing', :save
           menu.choice 'Review each transaction', :review
         end
-        send(action, new_ts, source)
+        send(action, new_ts, upload_id)
       end
 
-      def save(transactions, _source)
+      def save(transactions, upload_id)
         count = 1
         transactions.each do |t|
           next if t.servicer.id == 'remove'
@@ -85,13 +95,11 @@ module Uploaders
             is_debit: t.is_debit,
             category_id: t.category.id,
             servicer_id: t.servicer.id,
-            source_id: source.id
+            upload_id: upload_id
           )
           count += 1
         end
       end
-
-      def review(transactions); end
 
       def extract_financial_data_from_csv(file, headers, date_format)
         Extractors::Financial::Csv.new(file, headers, date_format).extract!
