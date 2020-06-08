@@ -101,6 +101,10 @@ module Uploaders
         end
       end
 
+      def review(_transactions, _upload_id)
+        raise 'Not Implemented'
+      end
+
       def extract_financial_data_from_csv(file, headers, date_format)
         Extractors::Financial::Csv.new(file, headers, date_format).extract!
       end
