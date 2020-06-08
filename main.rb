@@ -6,4 +6,12 @@ Bundler.require(:default)
 
 require_relative 'app/fanalyze'
 
-Fanalyze.start(ARGV)
+def run!
+  Fanalyze.start(ARGV)
+rescue TTY::Reader::InputInterrupt
+  puts
+  puts 'Exit program requested. Goodbye!'
+  exit
+end
+
+run!
