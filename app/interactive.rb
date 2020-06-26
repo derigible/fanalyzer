@@ -3,21 +3,23 @@
 require 'tty-prompt'
 require 'tty-table'
 require_relative 'uploaders/financial/csv'
+require_relative 'editors/transaction'
+require_relative 'queries/custom'
 
 class Interactive
-  attr_reader :prompt, :db_proxy, :statements
+  attr_reader :prompt, :db_proxy
   def initialize(database_proxy)
     @db_proxy = database_proxy
     @prompt = TTY::Prompt.new
-    @statements = []
   end
 
   def run!
     result = prompt.select('What would you like to do?') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Query Database', value: 1
-      menu.choice name: 'Upload CSV to Database', value: 2
+      menu.choice name: 'Query', value: 1
+      menu.choice name: 'Upload Data', value: 2
+      menu.choice name: 'Update Data', value: 3
     end
     send("run_#{result}".to_s)
   end
@@ -30,38 +32,30 @@ class Interactive
       %i[custom],
       enum: '.'
     )
-    send(result)
-    puts result
-    puts db_proxy.conn.from(result.to_s).all.count
+    "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
 
   def run_2
-    Uploaders::Financial::Csv.new(db_proxy, prompt).run!
+    result = prompt.select('Select type to upload.') do |menu|
+      menu.enum '.'
+
+      menu.choice name: 'Financial CSV', value: :financial_csv
+    end
+
+    type = result.to_s.split('_').map(&:camelize).join('::')
+
+    "Uploaders::#{type}".constantize.new(db_proxy, prompt).run!
   end
 
-  def custom
-    sql = nil
-    unless statements.empty?
-      statement = prompt.select(
-        'Previous statements:',
-        enum: '.'
-      ) do |menu|
-        menu.choice 'Create new statement', value: -1
-        count = 0
-        statements.each do |s|
-          menu.choice s, value: count
-          count += 1
-        end
-      end
-      sql = statements[statement[:value]] if statement[:value] > -1
+  def run_3
+    result = prompt.select('Select type to edit.') do |menu|
+      menu.enum '.'
+
+      menu.choice name: 'Transaction', value: :transaction
+      menu.choice name: 'Servicer', value: :servicer
+      menu.choice name: 'Category', value: :category
     end
-    if sql.nil?
-      sql = prompt.ask('Enter sql:')
-    end
-    results = db_proxy.conn[sql]
-    table = TTY::Table.new(results.first.keys, results.map(&:values))
-    puts table.render(:ascii)
-    statements << sql unless statements.include? sql
-    custom
+
+    "Editors::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
 end

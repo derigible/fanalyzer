@@ -71,7 +71,9 @@ Your quering should look like the following:
 ![querying data](./assets/querying_data.png)
 
 ### Uploading Data
-Choose option #2 in the command prompt. This will lead you to a series of questions.
+Choose option #2 in the command prompt and then choose the type of data you would like to upload. This will lead you to a series of questions.
+
+** Note that currently only Financial CSV uploads are supported.
 
 #### Source
 A source is the source of the file you will be uploading, such as your bank statement download, from mint.com, or any other source that provides a csv. This will be used to track where data was loaded from and at what time (via an associated upload record in the database).
