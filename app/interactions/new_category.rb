@@ -13,7 +13,8 @@ module Interactions
 
     def run!
       choice = prompt.select(
-        "New category #{category.name}. What would you like to do?"
+        "New category #{category.name}. What would you like to do?",
+        enum: '.'
       ) do |menu|
         menu.choice 'Save', :save
         menu.choice 'Map to a different category permanently', :map_perm
@@ -46,12 +47,12 @@ module Interactions
 
     private
 
-    def save
+    def save(_return_func)
       s = category_model.create name: category.name, upload_id: upload_id
       category.id = s.id
     end
 
-    def remove
+    def remove(_return_func)
       category.id = 'remove'
     end
 

@@ -74,7 +74,8 @@ module Uploaders
         return unless new_ts.size.positive?
 
         action = prompt.select(
-          "Found #{new_ts.size} new transactions. What would you like to do?"
+          "Found #{new_ts.size} new transactions. What would you like to do?",
+          enum: '.'
         ) do |menu|
           menu.choice 'Save without reviewing', :save
           menu.choice 'Review each transaction', :review

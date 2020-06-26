@@ -13,14 +13,15 @@ module Interactions
 
     def run!
       choice = prompt.select(
-        "New servicer #{servicer.name}. What would you like to do?"
+        "New servicer #{servicer.name}. What would you like to do?",
+        enum: '.'
       ) do |menu|
         menu.choice 'Save', :save
         menu.choice(
           'Remove (will remove all transactions on this upload)', :remove
         )
-        menu.choice 'Map to a different servicer permanently', :map_once
-        menu.choice 'Map to a different servicer on this upload', :map_perm
+        menu.choice 'Map to a different servicer permanently', :map_perm
+        menu.choice 'Map to a different servicer on this upload', :map_once
         menu.choice(
           'Rename servicer (future servicers will map to this name)', :rename
         )
@@ -31,7 +32,9 @@ module Interactions
 
     def transaction_edit!
       choice = prompt.select(
-        "Changing servicer #{servicer.name} on transaction. What would you like to do?"
+        "Changing servicer #{servicer.name} on transaction. /
+        What would you like to do?",
+        enum: '.'
       ) do |menu|
         menu.choice 'Keep', :keep
         menu.choice 'Edit a different transaction field', :edit_different
@@ -48,12 +51,12 @@ module Interactions
 
     private
 
-    def save
+    def save(_return_func)
       s = servicer_model.create name: servicer.name, upload_id: upload_id
       servicer.id = s.id
     end
 
-    def remove
+    def remove(_return_func)
       servicer.id = 'remove'
     end
 

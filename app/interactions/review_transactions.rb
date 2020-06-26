@@ -20,28 +20,54 @@ module Interactions
       @upload_id = upload_id
     end
 
-    def run!; end
+    def run!
+      save_and_exit = false
+      results = transactions.map do |t|
+        next if save_and_exit
+
+        result = review_transaction(t)
+        save_and_exit = result == :save_edited
+        next if save_and_exit
+
+        result
+      end.compact
+      results
+    end
 
     private
 
     def review_transaction(transaction)
-      table = TTY::Table.new(transaction.keys, transaction.values)
-      puts table.render(:ascii)
+      print_transaction(transaction)
       choice = prompt.select(
-        'Select action'
+        'Select action',
+        enum: '.'
       ) do |menu|
         menu.choice 'Next Transaction', :save
-        SelectHeaders::CHOICES.each do |field|
+        menu.choice 'Save Reviewed and Exit', :save_edited
+        (SelectHeaders::CHOICES - ['date']).each do |field|
           menu.choice("Edit #{field}", field.to_sym)
         end
       end
 
+      return transaction if choice == :save
+      return choice if choice == :save_edited
+
       edit(transaction, choice)
+      save?(transaction)
+    end
+
+    def normalize_transaction(transaction)
+      t = transaction.to_h.except(:date_format, :is_debit)
+      t[:servicer] = transaction.servicer.name
+      t[:category] = transaction.category.name
+      t[:type] = transaction.is_debit ? 'debit' : 'credit'
+      t
     end
 
     def edit(transaction, choice)
       return edit_servicer(transaction) if choice == :servicer
       return edit_category(transaction) if choice == :category
+      return edit_type(transaction) if choice == :type
 
       change = prompt.ask(
         'What should the new value be? (Leave blank to cancel edit)'
@@ -50,6 +76,7 @@ module Interactions
       return review_transaction(transaction) if change.empty?
 
       transaction[choice] = change
+      transaction
     end
 
     def edit_servicer(transaction)
@@ -65,6 +92,26 @@ module Interactions
       ).transaction_edit!
 
       review_transaction(transaction) if result == :edit_different
+    end
+
+    def edit_type(transaction)
+      transaction.is_debit = !transaction.is_debit
+    end
+
+    def save?(transaction)
+      puts
+      puts 'Updated transaction'
+      print_transaction(transaction)
+      result = prompt.yes?('Continue editing transaction?')
+      result ? review_transaction(transaction) : transaction
+    end
+
+    def print_transaction(transaction)
+      normalized_transaction = normalize_transaction(transaction)
+      table = TTY::Table.new(
+        normalized_transaction.keys, [normalized_transaction.values]
+      )
+      puts table.render(:ascii)
     end
   end
 end

@@ -42,7 +42,10 @@ class Interactive
   def custom
     sql = nil
     unless statements.empty?
-      statement = prompt.select('Previous statements:') do |menu|
+      statement = prompt.select(
+        'Previous statements:',
+        enum: '.'
+      ) do |menu|
         menu.choice 'Create new statement', value: -1
         count = 0
         statements.each do |s|
