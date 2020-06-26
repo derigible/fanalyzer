@@ -26,7 +26,24 @@ module Interactions
         )
       end
 
-      send(choice)
+      send(choice, method(:run!))
+    end
+
+    def transaction_edit!
+      choice = prompt.select(
+        "Changing servicer #{servicer.name} on transaction. What would you like to do?"
+      ) do |menu|
+        menu.choice 'Keep', :keep
+        menu.choice 'Edit a different transaction field', :edit_different
+        menu.choice 'Map to a different servicer on this upload', :map_once
+        menu.choice(
+          'Rename servicer (future servicers will map to this name)', :rename
+        )
+      end
+
+      return choice if %i[keep edit_different].include? choice
+
+      send(choice, method(:transaction_edit!))
     end
 
     private
@@ -40,17 +57,17 @@ module Interactions
       servicer.id = 'remove'
     end
 
-    def map_once
+    def map_once(return_func)
       use = find_servicer
-      return run! if use == :none
+      return return_func.call if use == :none
 
       servicer.id = use.id
       servicer.name = use.name
     end
 
-    def map_perm
+    def map_perm(return_func)
       use = find_servicer
-      return run! if use == :none
+      return return_func.call if use == :none
 
       servicer_model.create(
         name: servicer.name, servicer_id: use.id, upload_id: upload_id
@@ -59,11 +76,11 @@ module Interactions
       servicer.name = use.name
     end
 
-    def rename
+    def rename(return_func)
       new_name = prompt.ask(
         'What should the new name be? (leave blank to select new choice)'
       )
-      return run! if new_name == ''
+      return return_func.call if new_name == ''
 
       unless servicer_model[name: new_name].nil?
         puts("Servicer #{new_name} already exists.")
@@ -74,8 +91,7 @@ module Interactions
     end
 
     def find_servicer
-      # exclude here creates a "servicer_id IS NOT NULL" clause
-      servicers = servicer_model.exclude(servicer_id: nil)
+      servicers = servicer_model
       prompt.select('Select servicer to map to') do |menu|
         servicers.each do |s|
           menu.choice s.name, s

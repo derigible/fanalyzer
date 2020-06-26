@@ -8,6 +8,7 @@ require_relative '../../interactions/select_source'
 require_relative '../../interactions/select_date_format'
 require_relative '../../interactions/new_servicer'
 require_relative '../../interactions/new_category'
+require_relative '../../interactions/review_transactions'
 require_relative '../../extractors/financial/csv'
 
 module Uploaders
@@ -101,8 +102,13 @@ module Uploaders
         end
       end
 
-      def review(_transactions, _upload_id)
-        raise 'Not Implemented'
+      def review(transactions, upload_id)
+        save(
+          Interactions::ReviewTransactions.new(
+            transactions, servicer_model, category_model, prompt, upload_id
+          ).run!,
+          upload_id
+        )
       end
 
       def extract_financial_data_from_csv(file, headers, date_format)
