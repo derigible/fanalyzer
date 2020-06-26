@@ -20,6 +20,7 @@ class DatabaseProxy
                   else
                     DatabaseConnections::Postgres.new(db_name)
                   end
+    load_models
   end
 
   def create_database(options)
@@ -62,6 +63,10 @@ class DatabaseProxy
     conn
     require_relative "../db/models/#{model}"
     "Models::#{model.to_s.camelize}".constantize
+  end
+
+  def load_models
+    %i[servicer category transaction].each { |m| model(m) }
   end
 
   delegate :create!, to: :connection

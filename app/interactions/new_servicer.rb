@@ -32,8 +32,8 @@ module Interactions
 
     def transaction_edit!
       choice = prompt.select(
-        "Changing servicer #{servicer.name} on transaction. /
-        What would you like to do?",
+        "Changing servicer #{servicer.name} on transaction. " \
+        'What would you like to do?',
         enum: '.'
       ) do |menu|
         menu.choice 'Keep', :keep

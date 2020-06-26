@@ -11,7 +11,7 @@ module Interactions
     )
 
     def initialize(
-      transactions, servicer_model, category_model, tty_prompt, upload_id
+      servicer_model, category_model, tty_prompt, upload_id, transactions = []
     )
       @transactions = transactions
       @servicer_model = servicer_model
@@ -32,6 +32,24 @@ module Interactions
         result
       end.compact
       results
+    end
+
+    def edit_transaction(transaction)
+      print_transaction(transaction)
+      choice = prompt.select(
+        'Select action',
+        enum: '.'
+      ) do |menu|
+        menu.choice 'Save', :save
+        (SelectHeaders::CHOICES - ['date']).each do |field|
+          menu.choice("Edit #{field}", field.to_sym)
+        end
+      end
+
+      return transaction if choice == :save
+
+      edit(transaction, choice)
+      save?(transaction)
     end
 
     private

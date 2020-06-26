@@ -106,7 +106,7 @@ module Uploaders
       def review(transactions, upload_id)
         save(
           Interactions::ReviewTransactions.new(
-            transactions, servicer_model, category_model, prompt, upload_id
+            servicer_model, category_model, prompt, upload_id, transactions
           ).run!,
           upload_id
         )
