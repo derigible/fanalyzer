@@ -144,30 +144,30 @@ After all categories have been handled, Fanalyzer will scan through each transac
 This will save all found transactions into the database without any review.
 
 ###### Review each transaction
-This option will prompt you to review each transaction. The idea behind this is that there may be some actions that you wish to take on a particular transaction (such as split into two transactions).
+This option will prompt you to review each transaction. The idea behind this is that there may be some actions that you wish to take on a particular transaction (such as split into two transactions, edit the description, etc.).
 
-** Note - this feature is not currently done, but is on the road map. There are lots of features intended for this branch of uploading, such as transaction splitting, transaction editing before save, adding tags, and transaction combining.
+When you select this option, you will be prompted for each transaction with a table of the transaction and a choice to edit the transaction fields, move on to the next transaction to review, or to save the transactions you have edited and exit the program.
 
-*** Note 2 - at some point a transaction will be rolled into a construct called an event, where an event contains all the transactions relevant to a financial event (such as purchasing something using a checking account, which in turn will cause an overdraft pull from a savings account to cover the purchase event - all transactions that are recorded separately but are related to the same event).
+A transaction is shown:
+
+![Review Transaction](./assets/review-transaction.png)
+
+Make an edit:
+
+![Edit Field](./assets/edit-field.png)
+
+After making an edit, you are shown the updated transaction and will be prompted to save the changes or make new changes. If you are unhappy with a change made, then you can use this prompt to redo an edit.
+
+![Save or Continue](./assets/save-or-continue.png)
+
+*** Note - transaction merging and splitting are not yet complete, but once this feature is added you will also be able to split a transaction and merge with another transaction during this review process.
 
 ## Roadmap and Todos
 There are lots of things that I would like to do with Fanalyzer. Below is a list of a few features on the roadmap:
 
 FEATURES
-- [ ] Add Servicer Manually
-- [ ] Add Category Manually
-- [ ] Add Transaction Manually
-- [ ] Edit Transaction Metadata
-- [ ] Add Event Rollup Functionality
-- [ ] Add New Transaction Review
-- [ ] Allow for csv upload without categories
-- [ ] Allow for csv upload without servicers
-- [ ] Allow for other type of data format upload (json, yaml)?
-- [ ] Persisting sql queries to database
-- [ ] Persist query results to file
-- [ ] Persist query results to database
-- [ ] Create reporting (not sure what this will look like, but will be canned reports that can be viewed as an option from the main dialog)
-- [ ] Support Custom Date formats
+
+You can follow the features board at https://github.com/derigible/fanalyzer/projects/1
 
 ## Contributing
 > Contributions to this project are encouraged and welcome.
