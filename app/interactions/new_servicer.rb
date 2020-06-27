@@ -95,7 +95,9 @@ module Interactions
 
     def find_servicer
       servicers = servicer_model
-      prompt.select('Select servicer to map to') do |menu|
+      prompt.select(
+        'Select servicer to map to (type to search)', filter: true
+      ) do |menu|
         servicers.each do |s|
           menu.choice s.name, s
         end

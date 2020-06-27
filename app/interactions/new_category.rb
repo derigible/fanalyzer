@@ -30,7 +30,8 @@ module Interactions
 
     def transaction_edit!
       choice = prompt.select(
-        "Changing category #{category.name} on transaction. What would you like to do?"
+        "Changing category #{category.name} on transaction. What would you " \
+        'like to do?'
       ) do |menu|
         menu.choice 'Keep', :keep
         menu.choice 'Edit a different transaction field', :edit_different
@@ -91,7 +92,9 @@ module Interactions
 
     def find_category
       categories = category_model
-      prompt.select('Select category to map to') do |menu|
+      prompt.select(
+        'Select category to map to (type to search)', filter: true
+      ) do |menu|
         categories.each do |c|
           menu.choice c.name, c
         end

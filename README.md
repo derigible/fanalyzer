@@ -117,6 +117,8 @@ This and all future uploads will treat this servicer as one that has already bee
 ###### Map to a Different Servicer on this Upload
 For this upload only map each transaction to a servicer that already has been saved in the database. Future uploads will not recognize this mapping and you will be prompted again for what to do with this servicer and all transactions associated with it.
 
+When selecting you can search for the servicer if it exists by entering the name, though no cursor appears.
+
 ###### Rename Servicer
 Map servicer name to a different name. All future uploads will also map to this new servicer name.
 
@@ -133,6 +135,8 @@ This and all future uploads will treat this category as one that has already bee
 
 ###### Map to a Different Category on this Upload
 For this upload only map each transaction to a category that already has been saved in the database. Future uploads will not recognize this mapping and you will be prompted again for what to do with this category and all transactions associated with it.
+
+When selecting you can search for the category if it exists by entering the name, though no cursor appears.
 
 ###### Rename Category
 Map category name to a different name. All future uploads will also map to this new category name.
