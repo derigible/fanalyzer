@@ -72,7 +72,7 @@ module Editors
     end
 
     def menu_end_choice(transactions, menu)
-      if transactions.size == 50
+      if transactions.size == PAGE_SIZE
         menu.choice 'See More', :see_more
       else
         menu.choice 'End of list. Start Over.', :start_over

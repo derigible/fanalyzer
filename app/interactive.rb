@@ -52,8 +52,6 @@ class Interactive
       menu.enum '.'
 
       menu.choice name: 'Transaction', value: :transaction
-      menu.choice name: 'Servicer', value: :servicer
-      menu.choice name: 'Category', value: :category
     end
 
     "Editors::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!

@@ -168,6 +168,19 @@ After making an edit, you are shown the updated transaction and will be prompted
 
 *** Note - transaction merging and splitting are not yet complete, but once this feature is added you will also be able to split a transaction and merge with another transaction during this review process.
 
+### Updating Data
+To update data that has already been entered into the database, run `ruby main.rb interact` and choose option 3 (Update Data) in the "Select Type to Edit" menu.
+
+![Update Transaction](./assets/edit-transaction.png)
+
+** Note that currently only Transaction edits are supported, though future types will be available in this menu.
+
+#### Transaction Edit
+
+Select `Transaction` as the type to edit. You can then either enter the id of the transaction in the database, or you can press `enter` to start browsing through the available transactions. After selecting a transaction you can [review the transaction](#Review-each-transaction).
+
+Once editing is complete you can choose another transaction to edit.
+
 ## Roadmap and Todos
 There are lots of things that I would like to do with Fanalyzer. Below is a list of a few features on the roadmap:
 
