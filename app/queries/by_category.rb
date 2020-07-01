@@ -23,7 +23,7 @@ module Queries
 
     def query
       category = find_category
-      transactions = transaction_model.where(category: category).to_a
+      transactions = filters(transaction_model.where(category: category)).to_a
       print_transactions(transactions)
       print_stats(transactions)
     end

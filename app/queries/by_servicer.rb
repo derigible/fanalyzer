@@ -23,7 +23,7 @@ module Queries
 
     def query
       servicer = find_servicer
-      transactions = transaction_model.where(servicer: servicer).to_a
+      transactions = filters(transaction_model.where(servicer: servicer)).to_a
       print_transactions(transactions)
       print_stats(transactions)
     end

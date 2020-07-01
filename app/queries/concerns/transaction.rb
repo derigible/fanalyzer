@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
+require_relative 'date'
+
 module Queries
   module Concerns
     module Transaction
+      include Queries::Concerns::Date
+
       private
+
+      def filters(models)
+        date_filters(models)
+      end
 
       def print_transactions(transactions)
         table = TTY::Table.new(
