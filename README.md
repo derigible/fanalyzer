@@ -60,6 +60,9 @@ ruby main.rb interact
 This will bring up some options to do with the system, such as query your data or upload new data.
 
 ### Querying Data
+There are several built in query prompts, as well as the default sql query implementation called "custom."
+
+#### Custom
 Choose option #1 in the command prompt. This will ask you to enter an sql statement.
 
 There is no limit to the kinds of sql you can enter, so if you are familiar with sql you should be able to create any type of query that you want with an output of the data in a table to the terminal.
@@ -69,6 +72,16 @@ If you are not familiar with sql, [here is a primer](https://www.w3schools.com/s
 Your quering should look like the following:
 
 ![querying data](./assets/querying_data.png)
+
+#### By Category
+Choose option #2 `Transactions by Category` in the command prompt. You will be prompted to select a category. Choose a category (or type to find the one that you want) and press enter. This will display a table of results and a simple summary.
+
+After that query is run you will be able to do another query using a category.
+
+#### By Servicer
+Choose option #3 `Transactions by Servicer` in the command prompt. You will be prompted to select a servicer. Choose a servicer (or type to find the one that you want) and press enter. This will display a table of results and a simple summary.
+
+After that query is run you will be able to do another query using a servicer.
 
 ### Uploading Data
 Choose option #2 in the command prompt and then choose the type of data you would like to upload. This will lead you to a series of questions.
