@@ -46,7 +46,7 @@ module Editors
 
     def browse
       transactions = transaction_model.limit(PAGE_SIZE, page * PAGE_SIZE).to_a
-      result = prompt.select('Select your transaction:') do |menu|
+      result = prompt.select('Select your transaction:', per_page: 15) do |menu|
         transactions.each do |t|
           menu.choice tableize(t), t
         end
@@ -57,14 +57,7 @@ module Editors
     end
 
     def tableize(transaction)
-      table_normalize(transaction).values.join(' | ')
-    end
-
-    def table_normalize(transaction)
-      t = transaction.to_struct.to_h
-      t[:servicer] = t[:servicer].name
-      t[:category] = t[:category].name
-      t
+      transaction.to_table_row.join(' | ')
     end
 
     def numeric?(digit)

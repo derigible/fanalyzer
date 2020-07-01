@@ -3,6 +3,7 @@
 require_relative 'select_headers'
 require_relative 'new_servicer'
 require_relative 'new_category'
+require 'active_support/core_ext/object/blank'
 
 module Interactions
   class ReviewTransactions
@@ -91,7 +92,7 @@ module Interactions
         'What should the new value be? (Leave blank to cancel edit)'
       )
 
-      return review_transaction(transaction) if change.empty?
+      return review_transaction(transaction) if change.blank?
 
       transaction[choice] = change
       transaction

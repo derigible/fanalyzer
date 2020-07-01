@@ -5,6 +5,8 @@ require 'tty-table'
 require_relative 'uploaders/financial/csv'
 require_relative 'editors/transaction'
 require_relative 'queries/custom'
+require_relative 'queries/by_category'
+require_relative 'queries/by_servicer'
 
 class Interactive
   attr_reader :prompt, :db_proxy
@@ -27,11 +29,11 @@ class Interactive
   private
 
   def run_1
-    result = prompt.select(
-      'Select query option.',
-      %i[custom],
-      enum: '.'
-    )
+    result = prompt.select('Select query option.', enum: '.') do |menu|
+      menu.choice name: 'Custom', value: :custom
+      menu.choice name: 'Tranactions by Category', value: :by_category
+      menu.choice name: 'Tranactions by Servicer', value: :by_servicer
+    end
     "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
 
