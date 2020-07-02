@@ -29,7 +29,7 @@ module Queries
           before_date_filter(models, compare)
         end
 
-        models.where { date > before_date }
+        models.where { date < before_date }
       end
 
       def after_date_filter(models)
