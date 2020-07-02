@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative './concerns/transaction'
+require_relative './concerns/date'
 
-module Queries
+module Comparisons
   class ByServicer
-    include Queries::Concerns::Transaction
+    include Comparisons::Concerns::Date
     attr_accessor :proxy, :prompt
 
     def initialize(db_proxy, tty_prompt)
@@ -13,24 +13,24 @@ module Queries
     end
 
     def run!
-      query
+      compare
 
-      query while prompt.yes?('Do another query by servicer?')
+      compare while prompt.yes?('Do another compare by servicer?')
     end
 
     private
 
-    def query
+    def compare
       servicer = find_servicer
-      transactions = filters(transaction_model.where(servicer: servicer)).to_a
-      print_transactions(transactions)
-      print_stats(transactions)
+      compared = comparisons(transaction_model.where(servicer: servicer)).to_a
+      print_compared(compared)
+      print_differences(compared)
     end
 
     def find_servicer
       servicers = servicer
       prompt.select(
-        'Select servicer to search by (type to search)', filter: true
+        'Select servicer to compare by (type to search)', filter: true
       ) do |menu|
         servicers.each do |c|
           menu.choice c.name, c

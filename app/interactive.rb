@@ -8,6 +8,10 @@ require_relative 'queries/custom'
 require_relative 'queries/by_category'
 require_relative 'queries/by_servicer'
 require_relative 'queries/by_date'
+require_relative 'comparisons/by_category'
+require_relative 'comparisons/by_servicer'
+require_relative 'comparisons/by_income'
+require_relative 'comparisons/by_expenses'
 
 class Interactive
   attr_reader :prompt, :db_proxy
@@ -20,16 +24,17 @@ class Interactive
     result = prompt.select('What would you like to do?') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Query', value: 1
-      menu.choice name: 'Upload Data', value: 2
-      menu.choice name: 'Update Data', value: 3
+      menu.choice name: 'Query', value: :query
+      menu.choice name: 'Compare', value: :compare
+      menu.choice name: 'Upload Data', value: :upload_data
+      menu.choice name: 'Update/Browse Data', value: :update_data
     end
-    send("run_#{result}".to_s)
+    send(result)
   end
 
   private
 
-  def run_1
+  def query
     result = prompt.select('Select query option.', enum: '.') do |menu|
       menu.choice name: 'Tranactions by Category', value: :by_category
       menu.choice name: 'Tranactions by Servicer', value: :by_servicer
@@ -39,7 +44,19 @@ class Interactive
     "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
 
-  def run_2
+  def compare
+    result = prompt.select('Select comparison option.', enum: '.') do |menu|
+      menu.choice 'Transactions by Category', :by_category
+      menu.choice 'Transactions by Servicer', :by_servicer
+      menu.choice 'Income', :by_income
+      menu.choice 'Expenses', :by_expenses
+    end
+    "Comparisons::#{result.to_s.camelize}".constantize.new(
+      db_proxy, prompt
+    ).run!
+  end
+
+  def upload_data
     result = prompt.select('Select type to upload.') do |menu|
       menu.enum '.'
 
@@ -51,7 +68,7 @@ class Interactive
     "Uploaders::#{type}".constantize.new(db_proxy, prompt).run!
   end
 
-  def run_3
+  def update_data
     result = prompt.select('Select type to edit.') do |menu|
       menu.enum '.'
 

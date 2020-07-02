@@ -5,12 +5,11 @@ require_relative './concerns/transaction'
 module Queries
   class ByDate
     include Queries::Concerns::Transaction
-    attr_accessor :proxy, :prompt, :statements
+    attr_accessor :proxy, :prompt
 
     def initialize(db_proxy, tty_prompt)
       @proxy = db_proxy
       @prompt = tty_prompt
-      @statements = []
     end
 
     def run!

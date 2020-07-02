@@ -17,6 +17,7 @@ module Queries
             menu.choice 'Last 7 days', :past_7_days
             menu.choice 'Last 30 days', :past_30_days
             menu.choice 'Enter previous number days', :past_custom_days
+            menu.choice 'This month', :this_month
             menu.choice 'This quarter', :this_quarter
             menu.choice 'Year to date', :year_to_date
             menu.choice 'Custom', :custom
@@ -48,6 +49,11 @@ module Queries
       def this_quarter(models)
         d = ::Date.today
         apply_after_date_filter(models, d.beginning_of_quarter).first
+      end
+
+      def this_month(models)
+        d = ::Date.today
+        apply_after_date_filter(models, d.beginning_of_month).first
       end
 
       def year_to_date(models)
