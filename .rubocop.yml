@@ -31,3 +31,6 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/DoubleNegation:
   Enabled: false
+
+Style/FormatStringToken:
+  Enabled: false

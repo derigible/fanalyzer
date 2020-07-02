@@ -31,10 +31,10 @@ class Interactive
 
   def run_1
     result = prompt.select('Select query option.', enum: '.') do |menu|
-      menu.choice name: 'Custom', value: :custom
       menu.choice name: 'Tranactions by Category', value: :by_category
       menu.choice name: 'Tranactions by Servicer', value: :by_servicer
       menu.choice name: 'Tranactions by Date', value: :by_date
+      menu.choice name: 'Custom', value: :custom
     end
     "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end

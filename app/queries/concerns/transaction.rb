@@ -11,10 +11,16 @@ module Queries
       private
 
       def filters(models)
-        date_filters(models)
+        if prompt.yes?('Apply additional filters?')
+          date_filters(models)
+        else
+          models
+        end
       end
 
       def print_transactions(transactions)
+        return if transactions.empty?
+
         table = TTY::Table.new(
           transactions.first.table_keys,
           transactions.map(&:to_table_row)
