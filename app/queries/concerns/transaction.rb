@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'date'
+require 'active_support/core_ext/numeric/conversions'
 
 module Queries
   module Concerns
@@ -24,11 +25,33 @@ module Queries
       def print_stats(transactions)
         puts
         total_table = TTY::Table.new(
-          %i[Count Total],
-          [[transactions.count, transactions.sum(&:amount)]]
+          [
+            'Total Transactions',
+            '# Income Transactions',
+            'Income Total',
+            '# Expense Transactions',
+            'Expense Total',
+            'Total'
+          ],
+          [transactions_stats(transactions)]
         )
         puts total_table.render(:ascii)
       end
+
+      # rubocop:disable Metrics/AbcSize
+      def transactions_stats(transactions)
+        [
+          transactions.count,
+          transactions.count { |t| !t.is_debit },
+          transactions.sum { |t| t.is_debit ? 0 : t.amount }.to_s(:currency),
+          transactions.count(&:is_debit),
+          transactions.sum { |t| t.is_debit ? t.amount : 0 }.to_s(:currency),
+          transactions.sum do |t|
+            t.is_debit ? -t.amount : t.amount
+          end.to_s(:currency)
+        ]
+      end
+      # rubocop:enable Metrics/AbcSize
 
       def transaction_model
         @transaction_model ||= proxy.model(:transaction)

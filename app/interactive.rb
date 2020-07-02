@@ -7,6 +7,7 @@ require_relative 'editors/transaction'
 require_relative 'queries/custom'
 require_relative 'queries/by_category'
 require_relative 'queries/by_servicer'
+require_relative 'queries/by_date'
 
 class Interactive
   attr_reader :prompt, :db_proxy
@@ -33,6 +34,7 @@ class Interactive
       menu.choice name: 'Custom', value: :custom
       menu.choice name: 'Tranactions by Category', value: :by_category
       menu.choice name: 'Tranactions by Servicer', value: :by_servicer
+      menu.choice name: 'Tranactions by Date', value: :by_date
     end
     "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
