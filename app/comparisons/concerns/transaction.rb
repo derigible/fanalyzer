@@ -19,17 +19,19 @@ module Comparisons
 
         headers = compared.map do |c|
           c.map(&:description)
-        end.flatten.reverse
+        end.flatten
 
         values = compared.map do |c|
           c.map(&:sum)
-        end.flatten.reverse
+        end.flatten
 
         table = TTY::Table.new(
           headers,
-          values
+          [values]
         )
-        puts table.render(:ascii)
+        puts table.render(
+          :ascii, alignment: :center, multiline: true
+        )
       end
 
       def print_differences(_compared)
