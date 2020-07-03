@@ -11,38 +11,30 @@ module Comparisons
       module CompareYearByYear
         private
 
-        def compare_year_by_year(models, num_periods_between, period, iteration)
+        def compare_year_by_year(models, num_periods_between, iteration)
           [
-            make_comparison(iteration, first(period, iteration), models),
             make_comparison(
               iteration,
-              second(num_periods_between, period, iteration),
+              first_year_period(iteration),
+              models
+            ),
+            make_comparison(
+              iteration,
+              second_year_period(num_periods_between, iteration),
               models
             ),
           ]
         end
 
-        # def first(period, iteration)
-        #   offset = (period * (iteration - 1))
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
+        def first_year_period(iteration)
+          year = (iteration + 1).year.ago
+          [year.beginning_of_year, year.end_of_year]
+        end
 
-        # def second(num_periods_between, period, iteration)
-        #   offset = period * num_periods_between * iteration
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
-
-        # def make_comparison(iteration, range, models)
-        #   result = models.where(date: Range.new(*range))
-        #   Comparison.new(
-        #     "Period #{iteration}\n" \
-        #     "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
-        #     "#{range.first.strftime('%m/%d/%Y')}",
-        #     result,
-        #     result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
-        #     iteration
-        #   )
-        # end
+        def second_year_period(num_periods_between, iteration)
+          year = (iteration + 1 + num_periods_between).year.ago
+          [year.beginning_of_year, year.end_of_year]
+        end
       end
     end
   end
