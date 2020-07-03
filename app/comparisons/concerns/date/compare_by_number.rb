@@ -23,25 +23,33 @@ module Comparisons
         end
 
         def first(period, iteration)
-          offset = (period * (iteration - 1))
+          offset = (period * iteration)
           [(offset + period).days.ago, offset.days.ago]
         end
 
         def second(num_periods_between, period, iteration)
-          offset = period * num_periods_between * iteration
+          offset = (period * iteration) + (period * num_periods_between)
           [(offset + period).days.ago, offset.days.ago]
         end
 
         def make_comparison(iteration, range, models)
           result = models.where(date: Range.new(*range))
           Comparison.new(
-            "Period #{iteration}\n" \
-            "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
-            "#{range.first.strftime('%m/%d/%Y')}",
+            "Comparison #{iteration + 1}\n" \
+            "#{fmt_date(range.second)}\nto\n" \
+            "#{fmt_date(range.first)}",
             result,
-            result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
-            iteration
+            sum(result),
+            iteration + 1
           )
+        end
+
+        def fmt_date(date)
+          date.strftime('%m/%d/%Y')
+        end
+
+        def sum(result)
+          result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount }
         end
       end
     end

@@ -21,7 +21,7 @@ module Comparisons
         return if compared.empty?
 
         puts
-        puts 'Sum of Transactions for Each Date Range of Each Period:'
+        puts 'Sum of Transactions for Each Date Range of Each Comparison:'
         puts
         headers = compared.map do |c|
           c.map(&:description)
@@ -36,10 +36,10 @@ module Comparisons
         return if compared.empty?
 
         puts
-        puts 'Difference for Each Period:'
+        puts 'Difference for Each Comparison:'
         puts
         headers = compared.map do |c|
-          "Period #{c.first.iteration} Difference"
+          "Comparison #{c.first.iteration} Difference"
         end
         values = compared.map do |c|
           c.first.sum - c.second.sum

@@ -23,7 +23,7 @@ module Comparisons
         num_comparisons = ask_number_comparisons
         period = comparison_period
         comps = []
-        (1..num_comparisons).each do |i|
+        (0..num_comparisons - 1).each do |i|
           comps << do_compare(models, num_periods_between, period, i)
         end
         comps
