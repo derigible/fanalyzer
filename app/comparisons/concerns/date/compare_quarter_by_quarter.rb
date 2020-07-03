@@ -12,39 +12,53 @@ module Comparisons
         private
 
         def compare_quarter_by_quarter(
-          models, num_periods_between, period, iteration
+          models, num_periods_between, iteration
         )
           [
-            make_comparison(iteration, first(period, iteration), models),
             make_comparison(
               iteration,
-              second(num_periods_between, period, iteration),
+              first_quarter_period(iteration),
+              models
+            ),
+            make_comparison(
+              iteration,
+              second_quarter_period(num_periods_between, iteration),
               models
             ),
           ]
         end
 
-        # def first(period, iteration)
-        #   offset = (period * (iteration - 1))
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
+        def first_quarter_period(iteration)
+          quarter = find_first_quarter(iteration)
+          [quarter.beginning_of_quarter, quarter.end_of_quarter]
+        end
 
-        # def second(num_periods_between, period, iteration)
-        #   offset = period * num_periods_between * iteration
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
+        def second_quarter_period(num_periods_between, iteration)
+          quarter = find_second_quarter(num_periods_between, iteration)
+          [quarter.beginning_of_quarter, quarter.end_of_quarter]
+        end
 
-        # def make_comparison(iteration, range, models)
-        #   result = models.where(date: Range.new(*range))
-        #   Comparison.new(
-        #     "Period #{iteration}\n" \
-        #     "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
-        #     "#{range.first.strftime('%m/%d/%Y')}",
-        #     result,
-        #     result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
-        #     iteration
-        #   )
-        # end
+        def find_first_quarter(iteration)
+          month = ((iteration * 3) + 1).months.ago
+          quarter = month.beginning_of_quarter
+          if quarter == ::Date.today.beginning_of_quarter
+            month.last_quarter.beginning_of_quarter
+          else
+            quarter
+          end
+        end
+
+        def find_second_quarter(num_periods_between, iteration)
+          # multiply num_periods_between by three to match the number
+          # of months ago that is expected
+          month = ((num_periods_between * 3) + (iteration * 3) + 1).months.ago
+          quarter = month.beginning_of_quarter
+          if quarter == ::Date.today.beginning_of_quarter
+            month.last_quarter.beginning_of_quarter
+          else
+            quarter
+          end
+        end
       end
     end
   end
