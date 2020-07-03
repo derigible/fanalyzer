@@ -3,6 +3,7 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/core_ext/date_and_time/calculations'
+require 'active_support/core_ext/array/access'
 
 module Comparisons
   module Concerns
@@ -38,7 +39,8 @@ module Comparisons
             "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
             "#{range.first.strftime('%m/%d/%Y')}",
             result,
-            result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount }
+            result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
+            iteration
           )
         end
       end

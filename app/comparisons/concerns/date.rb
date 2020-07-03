@@ -8,8 +8,6 @@ require_relative './date/compare_month_by_month'
 require_relative './date/compare_quarter_by_quarter'
 require_relative './date/compare_year_by_year'
 
-Comparison = Struct.new(:description, :transactions, :sum)
-
 module Comparisons
   module Concerns
     module Date

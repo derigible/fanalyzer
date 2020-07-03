@@ -39,7 +39,8 @@ module Comparisons
             "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
             "#{range.first.strftime('%m/%d/%Y')}",
             result,
-            result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount }
+            result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
+            iteration
           )
         end
       end

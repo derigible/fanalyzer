@@ -2,6 +2,9 @@
 
 require_relative 'date'
 require 'active_support/core_ext/numeric/conversions'
+require 'active_support/core_ext/array/access'
+
+Comparison = Struct.new(:description, :transactions, :sum, :iteration)
 
 module Comparisons
   module Concerns
@@ -17,14 +20,34 @@ module Comparisons
       def print_compared(compared)
         return if compared.empty?
 
+        puts
+        puts 'Sum of Transactions for Each Date Range of Each Period:'
+        puts
         headers = compared.map do |c|
           c.map(&:description)
         end.flatten
-
         values = compared.map do |c|
           c.map(&:sum)
         end.flatten
+        print_table(headers, values)
+      end
 
+      def print_differences(compared)
+        return if compared.empty?
+
+        puts
+        puts 'Difference for Each Period:'
+        puts
+        headers = compared.map do |c|
+          "Period #{c.first.iteration} Difference"
+        end
+        values = compared.map do |c|
+          c.first.sum - c.second.sum
+        end
+        print_table(headers, values)
+      end
+
+      def print_table(headers, values)
         table = TTY::Table.new(
           headers,
           [values]
@@ -32,10 +55,6 @@ module Comparisons
         puts table.render(
           :ascii, alignment: :center, multiline: true
         )
-      end
-
-      def print_differences(_compared)
-        puts 'Coming soon...'
       end
 
       def transaction_model
