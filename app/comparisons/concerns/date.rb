@@ -33,13 +33,13 @@ module Comparisons
         if period.is_a? Numeric
           compare_by_number(models, num_periods_between, period, iteration)
         elsif period == :month
-          compare_month_by_month(models, num_periods_between, period, iteration)
+          compare_month_by_month(models, num_periods_between, iteration)
         elsif period == :quarter
           compare_quarter_by_quarter(
-            models, num_periods_between, period, iteration
+            models, num_periods_between, iteration
           )
         elsif period == :year
-          compare_year_by_year(models, num_periods_between, period, iteration)
+          compare_year_by_year(models, num_periods_between, iteration)
         end
       end
 

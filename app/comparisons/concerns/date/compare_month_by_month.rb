@@ -4,6 +4,7 @@ require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/core_ext/date_and_time/calculations'
 require 'active_support/core_ext/array/access'
+require 'active_support/core_ext/integer/time'
 
 module Comparisons
   module Concerns
@@ -12,39 +13,33 @@ module Comparisons
         private
 
         def compare_month_by_month(
-          models, num_periods_between, period, iteration
+          models, num_periods_between, iteration
         )
           [
-            make_comparison(iteration, first(period, iteration), models),
             make_comparison(
               iteration,
-              second(num_periods_between, period, iteration),
+              first_month_period(iteration),
+              models
+            ),
+            make_comparison(
+              iteration,
+              second_month_period(num_periods_between, iteration),
               models
             ),
           ]
         end
 
-        # def first(period, iteration)
-        #   offset = (period * (iteration - 1))
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
+        def first_month_period(iteration)
+          # we don't want to show the current month, so add 1
+          month = (iteration + 1).months.ago
+          [month.beginning_of_month, month.end_of_month]
+        end
 
-        # def second(num_periods_between, period, iteration)
-        #   offset = period * num_periods_between * iteration
-        #   [(offset + period).days.ago, offset.days.ago]
-        # end
-
-        # def make_comparison(iteration, range, models)
-        #   result = models.where(date: Range.new(*range))
-        #   Comparison.new(
-        #     "Period #{iteration}\n" \
-        #     "#{range.second.strftime('%m/%d/%Y')}\nto\n" \
-        #     "#{range.first.strftime('%m/%d/%Y')}",
-        #     result,
-        #     result.to_a.sum { |t| t.is_debit ? t.amount : -t.amount },
-        #     iteration
-        #   )
-        # end
+        def second_month_period(num_periods_between, iteration)
+          # we don't want to show the current month, so add 1
+          month = (num_periods_between.months + (iteration + 1).months).ago
+          [month.beginning_of_month, month.end_of_month]
+        end
       end
     end
   end
