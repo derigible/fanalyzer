@@ -2,7 +2,7 @@
 
 module Interactions
   class SelectHeaders
-    CHOICES = %w[date description amount type servicer category].freeze
+    CHOICES = %w[date description amount type notes servicer category].freeze
 
     attr_reader :prompt, :header_mapping, :id
 
@@ -71,7 +71,8 @@ module Interactions
     def prompt_for_headings
       results = CHOICES.map do |c|
         prompt.ask(
-          "What is the heading for #{c.capitalize} (Leave empty if same)?"
+          "What is the heading for #{c.capitalize} " \
+          '(Leave empty if same. Enter :skip to skip header.)?'
         ) || c
       end
       puts(

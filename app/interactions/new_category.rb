@@ -12,6 +12,8 @@ module Interactions
     end
 
     def run!
+      return if category.name.nil?
+
       choice = prompt.select(
         "New category #{category.name}. What would you like to do?",
         enum: '.'

@@ -33,8 +33,7 @@ module Extractors
         headers.each_key do |h|
           t[h] = extract_field(row, h)
         end
-        t.is_debit = t.type.downcase == 'debit'
-        t.delete_field 'type'
+        map_debit(t)
         t
       end
 
@@ -45,7 +44,7 @@ module Extractors
           )
         end
 
-        record[headers[field]]
+        headers[field] == ':skip' ? nil : record[headers[field]]
       end
 
       def extract_transaction(transaction)
@@ -71,6 +70,13 @@ module Extractors
 
       def normalize_transaction_data(transaction)
         transaction.date = extract_field(transaction, 'date')
+      end
+
+      def map_debit(transaction)
+        # is_debit could get complicated. break it for now to clean
+        # up the code and to allow for future debit detection if needed
+        transaction.is_debit = transaction.type&.downcase == 'debit'
+        transaction.delete_field 'type'
       end
     end
   end

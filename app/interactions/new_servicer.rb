@@ -12,6 +12,8 @@ module Interactions
     end
 
     def run!
+      return if servicer.name.nil?
+
       choice = prompt.select(
         "New servicer #{servicer.name}. What would you like to do?",
         enum: '.'

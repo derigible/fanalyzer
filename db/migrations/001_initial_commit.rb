@@ -33,6 +33,7 @@ Sequel.migration do
       String :description, text: true
       Float :amount
       TrueClass :is_debit
+      String :notes, text: true, null: true
       foreign_key :category_id, :categories, on_delete: :set_null, null: true
       foreign_key :servicer_id, :servicers, on_delete: :set_null, null: true
       foreign_key :upload_id, :uploads, on_delete: :set_null, null: true
@@ -45,6 +46,7 @@ Sequel.migration do
       String :description, text: true
       String :amount, text: true
       String :type, text: true
+      String :notes, text: true
       String :servicer, text: true
       String :category, text: true
       String :date_format, text: true

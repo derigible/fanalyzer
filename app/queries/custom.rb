@@ -30,7 +30,7 @@ module Queries
         sql = prompt.ask('Enter sql:')
       end
       results = proxy.conn[sql]
-      table = TTY::Table.new(results.first.keys, results.map(&:values))
+      table = TTY::Table.new(results.first&.keys, results.map(&:values))
       puts table.render(:ascii)
       statements << sql unless statements.include? sql
       run!
