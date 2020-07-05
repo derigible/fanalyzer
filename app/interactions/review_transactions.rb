@@ -8,16 +8,22 @@ require 'active_support/core_ext/object/blank'
 module Interactions
   class ReviewTransactions
     attr_reader(
-      :prompt, :servicer_model, :transactions, :category_model, :upload_id
+      :prompt, :servicer_model, :transactions, :category_model, :label_model, :upload_id
     )
 
     def initialize(
-      servicer_model, category_model, tty_prompt, upload_id, transactions = []
+      servicer_model,
+      category_model,
+      label_model,
+      tty_prompt,
+      upload_id,
+      transactions = []
     )
       @transactions = transactions
       @servicer_model = servicer_model
       @prompt = tty_prompt
       @category_model = category_model
+      @label_model = label_model
       @upload_id = upload_id
     end
 
@@ -42,6 +48,8 @@ module Interactions
         enum: '.'
       ) do |menu|
         menu.choice 'Save', :save
+        menu.choice 'Add Label', :add_label
+        menu.choice 'Remove Label', :remove_label
         (SelectHeaders::CHOICES - ['date']).each do |field|
           menu.choice("Edit #{field}", field.to_sym)
         end
@@ -63,6 +71,8 @@ module Interactions
       ) do |menu|
         menu.choice 'Next Transaction', :save
         menu.choice 'Save Reviewed and Exit', :save_edited
+        menu.choice 'Add Label', :add_label
+        menu.choice 'Remove Label', :remove_label
         (SelectHeaders::CHOICES - ['date']).each do |field|
           menu.choice("Edit #{field}", field.to_sym)
         end
@@ -87,7 +97,13 @@ module Interactions
       return edit_servicer(transaction) if choice == :servicer
       return edit_category(transaction) if choice == :category
       return edit_type(transaction) if choice == :type
+      return add_label(transaction) if choice == :add_label
+      return remove_label(transaction) if choice == :remove_label
 
+      edit_field(transction, choice)
+    end
+
+    def edit_field(transaction, choice)
       change = prompt.ask(
         'What should the new value be? (Leave blank to cancel edit)'
       )
@@ -132,5 +148,47 @@ module Interactions
       )
       puts table.render(:ascii)
     end
+
+    def add_label(transaction)
+      action = prompt.select(
+        'Select how to add label (select None to cancel):'
+      ) do |menu|
+        menu.choice 'Create new', :create_label
+        menu.choice 'Attach existing', :attach_label
+        menu.choice 'None', :none
+      end
+      return review_transaction(transaction) if action == :none
+
+      send(action, transaction)
+    end
+
+    def find_label
+      labels = label_model
+      prompt.select(
+        'Select label to add (type to search)', filter: true
+      ) do |menu|
+        labels.each do |l|
+          menu.choice l.name, l
+        end
+        menu.choice 'None', :none
+      end
+    end
+
+    def create_label(transaction)
+      use = prompt.ask('Enter labels name (leave blank to do a different option)')
+      return add_label(transaction) if use.blank?
+
+      label = label_model.create(name: use)
+      transaction.label = label
+      review_transaction(transaction)
+    end
+
+    def attach_label(transaction)
+      label = find_label
+      transaction.label = label
+      review_transaction(transaction)
+    end
+
+    def remove_label; end
   end
 end

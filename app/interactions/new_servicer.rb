@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/object/blank'
+
 module Interactions
   class NewServicer
     attr_reader :prompt, :servicer_model, :servicer, :upload_id
@@ -85,7 +87,7 @@ module Interactions
       new_name = prompt.ask(
         'What should the new name be? (leave blank to select new choice)'
       )
-      return return_func.call if new_name == ''
+      return return_func.call if new_name.blank?
 
       unless servicer_model[name: new_name].nil?
         puts("Servicer #{new_name} already exists.")

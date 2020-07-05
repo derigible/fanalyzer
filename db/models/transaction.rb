@@ -6,6 +6,7 @@ module Models
   class Transaction < Sequel::Model
     many_to_one :servicer
     many_to_one :category
+    many_to_many :labels
 
     def to_struct
       OpenStruct.new(

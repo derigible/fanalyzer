@@ -90,23 +90,29 @@ module Uploaders
 
           puts "Creating new transaction #{count}"
 
-          transaction_model.create(
-            date: t.date,
-            description: t.description,
-            amount: t.amount,
-            is_debit: t.is_debit,
-            category_id: t.category.id,
-            servicer_id: t.servicer.id,
-            upload_id: upload_id
-          )
+          create_transaction(t, upload_id)
           count += 1
         end
+      end
+
+      def create_transaction(transaction, upload_id)
+        t = transaction_model.create(
+          date: transaction.date,
+          description: transaction.description,
+          amount: transaction.amount,
+          is_debit: transaction.is_debit,
+          category_id: transaction.category.id,
+          servicer_id: transaction.servicer.id,
+          upload_id: upload_id
+        )
+
+        t.add_label(transaction.label) if transaction.label
       end
 
       def review(transactions, upload_id)
         save(
           Interactions::ReviewTransactions.new(
-            servicer_model, category_model, prompt, upload_id, transactions
+            servicer_model, category_model, label_model, prompt, upload_id, transactions
           ).run!,
           upload_id
         )
@@ -114,10 +120,6 @@ module Uploaders
 
       def extract_financial_data_from_csv(file, headers, date_format)
         Extractors::Financial::Csv.new(file, headers, date_format).extract!
-      end
-
-      def save_transactions(file, headers, date_format)
-        Uploaders::Transactions.new(file, headers, date_format).extract!
       end
 
       def select_file
@@ -165,6 +167,10 @@ module Uploaders
 
       def category_model
         @category_model ||= db_proxy.model(:category)
+      end
+
+      def label_model
+        @label_model ||= db_proxy.model(:label)
       end
     end
   end

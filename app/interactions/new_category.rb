@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/object/blank'
+
 module Interactions
   class NewCategory
     attr_reader :prompt, :category_model, :category, :upload_id
@@ -82,7 +84,7 @@ module Interactions
       new_name = prompt.ask(
         'What should the new name be? (leave blank to select new choice)'
       )
-      return return_func.call if new_name.empty?
+      return return_func.call if new_name.blank?
 
       unless category_model[name: new_name].nil?
         puts("Category #{new_name} already exists.")

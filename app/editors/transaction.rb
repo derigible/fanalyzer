@@ -86,15 +86,23 @@ module Editors
 
     def edit(transaction)
       changes = Interactions::ReviewTransactions.new(
-        servicer_model, category_model, prompt, nil
+        servicer_model, category_model, label_model, prompt, nil
       ).edit_transaction(transaction.to_struct)
+      update_transaction(transaction, changes)
+    end
+
+    def update_transaction(transaction, changes)
+      label = changes.label
+      if label
+        transaction.add_label(label)
+      end
       transaction.update(normalize_changes(changes))
     end
 
     def normalize_changes(changes)
       changes[:servicer_id] = changes.servicer.id
       changes[:category_id] = changes.category.id
-      changes.to_h.except(:id, :servicer, :category)
+      changes.to_h.except(:id, :servicer, :category, :label)
     end
 
     def transaction_model
@@ -107,6 +115,10 @@ module Editors
 
     def category_model
       @category_model ||= proxy.model(:category)
+    end
+
+    def label_model
+      @label_model ||= proxy.model(:label)
     end
   end
 end
