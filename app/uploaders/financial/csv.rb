@@ -106,13 +106,18 @@ module Uploaders
           upload_id: upload_id
         )
 
-        t.add_label(transaction.label) if transaction.label
+        transaction.label&.each { |tl| t.add_label(tl.label) }
       end
 
       def review(transactions, upload_id)
         save(
           Interactions::ReviewTransactions.new(
-            servicer_model, category_model, label_model, prompt, upload_id, transactions
+            servicer_model,
+            category_model,
+            label_model,
+            prompt,
+            upload_id,
+            transactions
           ).run!,
           upload_id
         )

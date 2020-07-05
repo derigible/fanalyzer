@@ -10,7 +10,9 @@ Sequel.migration do
     create_table(:labels_transactions) do
       primary_key :id
       foreign_key :label_id, :labels, on_delete: :cascade, null: true
-      foreign_key :transaction_id, :transactions, on_delete: :cascade, null: true
+      foreign_key(
+        :transaction_id, :transactions, on_delete: :cascade, null: true
+      )
     end
   end
 end

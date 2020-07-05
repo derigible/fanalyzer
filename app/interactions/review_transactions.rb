@@ -3,12 +3,18 @@
 require_relative 'select_headers'
 require_relative 'new_servicer'
 require_relative 'new_category'
+require_relative 'new_label'
 require 'active_support/core_ext/object/blank'
 
 module Interactions
   class ReviewTransactions
     attr_reader(
-      :prompt, :servicer_model, :transactions, :category_model, :label_model, :upload_id
+      :prompt,
+      :servicer_model,
+      :transactions,
+      :category_model,
+      :label_model,
+      :upload_id
     )
 
     def initialize(
@@ -150,43 +156,11 @@ module Interactions
     end
 
     def add_label(transaction)
-      action = prompt.select(
-        'Select how to add label (select None to cancel):'
-      ) do |menu|
-        menu.choice 'Create new', :create_label
-        menu.choice 'Attach existing', :attach_label
-        menu.choice 'None', :none
-      end
-      return review_transaction(transaction) if action == :none
+      result = NewLabel.new(
+        label_model, prompt, transaction
+      ).run!
 
-      send(action, transaction)
-    end
-
-    def find_label
-      labels = label_model
-      prompt.select(
-        'Select label to add (type to search)', filter: true
-      ) do |menu|
-        labels.each do |l|
-          menu.choice l.name, l
-        end
-        menu.choice 'None', :none
-      end
-    end
-
-    def create_label(transaction)
-      use = prompt.ask('Enter labels name (leave blank to do a different option)')
-      return add_label(transaction) if use.blank?
-
-      label = label_model.create(name: use)
-      transaction.label = label
-      review_transaction(transaction)
-    end
-
-    def attach_label(transaction)
-      label = find_label
-      transaction.label = label
-      review_transaction(transaction)
+      review_transaction(transaction) if result == :edit_different
     end
 
     def remove_label; end

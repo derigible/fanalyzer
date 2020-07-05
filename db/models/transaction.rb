@@ -15,6 +15,7 @@ module Models
         description: description,
         amount: amount,
         is_debit: is_debit,
+        notes: notes,
         category: category.to_struct,
         servicer: servicer.to_struct
       )

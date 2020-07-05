@@ -64,7 +64,11 @@ module Interactions
         'Name of header mapping (leave blank to not save):'
       )
       mapping = create_mapping(results)
-      mapping[:id] = header_mapping.create(mapping.merge!(name: name)).id if name
+      if name
+        mapping[:id] = header_mapping.create(
+          mapping.merge!(name: name)
+        ).id
+      end
       mapping
     end
 
