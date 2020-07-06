@@ -4,6 +4,7 @@ require_relative 'select_headers'
 require_relative 'new_servicer'
 require_relative 'new_category'
 require_relative 'new_label'
+require_relative 'remove_label'
 require 'active_support/core_ext/object/blank'
 
 module Interactions
@@ -14,6 +15,7 @@ module Interactions
       :transactions,
       :category_model,
       :label_model,
+      :transaction_model,
       :upload_id
     )
 
@@ -21,6 +23,7 @@ module Interactions
       servicer_model,
       category_model,
       label_model,
+      transaction_model,
       tty_prompt,
       upload_id,
       transactions = []
@@ -30,6 +33,7 @@ module Interactions
       @prompt = tty_prompt
       @category_model = category_model
       @label_model = label_model
+      @transaction_model = transaction_model
       @upload_id = upload_id
     end
 
@@ -91,14 +95,6 @@ module Interactions
       save?(transaction)
     end
 
-    def normalize_transaction(transaction)
-      t = transaction.to_h.except(:date_format, :is_debit)
-      t[:servicer] = transaction.servicer.name
-      t[:category] = transaction.category.name
-      t[:type] = transaction.is_debit ? 'debit' : 'credit'
-      t
-    end
-
     def edit(transaction, choice)
       return edit_servicer(transaction) if choice == :servicer
       return edit_category(transaction) if choice == :category
@@ -139,12 +135,37 @@ module Interactions
       transaction.is_debit = !transaction.is_debit
     end
 
+    def add_label(transaction)
+      result = NewLabel.new(
+        label_model, prompt, transaction
+      ).run!
+
+      review_transaction(transaction) if result == :edit_different
+    end
+
+    def remove_label(transaction)
+      result = RemoveLabel.new(
+        transaction, transaction_model, label_model, prompt
+      ).run!
+
+      review_transaction(transaction) if result == :edit_different
+    end
+
     def save?(transaction)
       puts
       puts 'Updated transaction'
       print_transaction(transaction)
       result = prompt.yes?('Continue editing transaction?')
       result ? review_transaction(transaction) : transaction
+    end
+
+    def normalize_transaction(transaction)
+      t = transaction.to_h.except(:date_format, :is_debit)
+      t[:servicer] = transaction.servicer.name
+      t[:category] = transaction.category.name
+      t[:labels] = transaction.labels&.map(&:name)
+      t[:type] = transaction.is_debit ? 'debit' : 'credit'
+      t
     end
 
     def print_transaction(transaction)
@@ -154,15 +175,5 @@ module Interactions
       )
       puts table.render(:ascii)
     end
-
-    def add_label(transaction)
-      result = NewLabel.new(
-        label_model, prompt, transaction
-      ).run!
-
-      review_transaction(transaction) if result == :edit_different
-    end
-
-    def remove_label; end
   end
 end

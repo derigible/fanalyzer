@@ -17,7 +17,8 @@ module Models
         is_debit: is_debit,
         notes: notes,
         category: category.to_struct,
-        servicer: servicer.to_struct
+        servicer: servicer.to_struct,
+        labels: labels.map(&:to_struct)
       )
     end
 
@@ -25,6 +26,7 @@ module Models
       t = to_struct
       t.category = t.category.name
       t.servicer = t.servicer.name
+      t.labels = t.labels.map(&:name).join(',')
       t.upload_id = upload_id
       t.is_debit = is_debit ? 'debit' : 'credit'
       t.to_h.values

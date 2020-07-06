@@ -66,8 +66,8 @@ module Interactions
     end
 
     def append_label(transaction, label)
-      transaction.label ||= []
-      transaction.label << label
+      transaction.labels ||= []
+      transaction.labels << label
     end
   end
 end

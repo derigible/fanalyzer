@@ -66,7 +66,7 @@ class DatabaseProxy
   end
 
   def load_models
-    %i[servicer category transaction].each { |m| model(m) }
+    %i[servicer category transaction label].each { |m| model(m) }
   end
 
   delegate :create!, to: :connection

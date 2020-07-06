@@ -106,7 +106,7 @@ module Uploaders
           upload_id: upload_id
         )
 
-        transaction.label&.each { |tl| t.add_label(tl.label) }
+        transaction.labels&.each { |tl| t.add_label(tl) }
       end
 
       def review(transactions, upload_id)
@@ -115,6 +115,7 @@ module Uploaders
             servicer_model,
             category_model,
             label_model,
+            transaction_model,
             prompt,
             upload_id,
             transactions
