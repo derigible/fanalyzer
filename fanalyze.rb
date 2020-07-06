@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'byebug'
-require_relative './database_proxy'
-require_relative 'interactive'
+require_relative 'db/database_proxy'
+require_relative 'app/interactive'
 
 # Main entry to analyzer
 class Fanalyze < Thor

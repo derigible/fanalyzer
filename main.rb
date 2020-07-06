@@ -4,7 +4,7 @@ require 'bundler/setup'
 
 Bundler.require(:default)
 
-require_relative 'app/fanalyze'
+require_relative 'fanalyze'
 
 def run!
   Fanalyze.start(ARGV)
