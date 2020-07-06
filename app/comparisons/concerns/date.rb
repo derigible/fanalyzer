@@ -7,6 +7,8 @@ require_relative './date/compare_by_number'
 require_relative './date/compare_month_by_month'
 require_relative './date/compare_quarter_by_quarter'
 require_relative './date/compare_year_by_year'
+require_relative './date/compare_year_to_date'
+require_relative './date/compare_month_to_date'
 
 module Comparisons
   module Concerns
@@ -15,6 +17,8 @@ module Comparisons
       include Comparisons::Concerns::Date::CompareMonthByMonth
       include Comparisons::Concerns::Date::CompareQuarterByQuarter
       include Comparisons::Concerns::Date::CompareYearByYear
+      include Comparisons::Concerns::Date::CompareMonthToDate
+      include Comparisons::Concerns::Date::CompareYearToDate
 
       private
 
@@ -32,29 +36,34 @@ module Comparisons
       def do_compare(models, num_periods_between, period, iteration)
         if period.is_a? Numeric
           compare_by_number(models, num_periods_between, period, iteration)
-        elsif period == :month
-          compare_month_by_month(models, num_periods_between, iteration)
-        elsif period == :quarter
-          compare_quarter_by_quarter(
+        else
+          send(
+            "compare_#{period}".to_sym,
             models, num_periods_between, iteration
           )
-        elsif period == :year
-          compare_year_by_year(models, num_periods_between, iteration)
         end
       end
 
       def comparison_period
         use = prompt.select(
-          'Choose comparison period type:', enum: '.'
+          'Choose comparison period type:', enum: '.', per_page: 8
         ) do |menu|
           menu.choice '7 days', :days_7
           menu.choice '30 days', :days_30
           menu.choice 'Custom number days', :days_custom
-          menu.choice 'Month ', :month
-          menu.choice 'Quarter', :quarter
-          menu.choice 'Year', :year
+          menu.choice 'Month ', :month_by_month
+          menu.choice 'Quarter', :quarter_by_quarter
+          menu.choice 'Year', :year_by_year
+          menu.choice 'Month to Date', :month_to_date
+          menu.choice 'Year to Date', :year_to_date
         end
-        return use if %i[month quarter year].include?(use)
+        return use if %i[
+          month_by_month
+          quarter_by_quarter
+          year_by_year
+          month_to_date
+          year_to_date
+        ].include?(use)
 
         send(use)
       end
