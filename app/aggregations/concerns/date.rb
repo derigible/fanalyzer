@@ -12,7 +12,9 @@ module Aggregations
       def date_filters(models)
         if prompt.yes?('Filter by date?')
           use = prompt.select(
-            'Choose date filtering strategy:', enum: '.'
+            'Choose date filtering strategy (type to filter):',
+            enum: '.',
+            per_page: 7
           ) do |menu|
             menu.choice 'Last 7 days', :past_7_days
             menu.choice 'Last 30 days', :past_30_days

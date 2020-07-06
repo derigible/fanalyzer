@@ -1,30 +1,22 @@
 # frozen_string_literal: true
 
-require_relative './concerns/transaction'
+require_relative 'concerns/sum'
+require_relative 'base'
 
 module Aggregations
-  class ByServicer
-    include Aggregations::Concerns::Transaction
-    attr_accessor :proxy, :prompt
-
-    def initialize(db_proxy, tty_prompt)
-      @proxy = db_proxy
-      @prompt = tty_prompt
-    end
-
-    def run!
-      query
-
-      query while prompt.yes?('Do another query by servicer?')
-    end
-
+  class ByServicer < Base
     private
 
-    def query
+    def rerun_prompt
+      'Do another aggregate by category?'
+    end
+
+    def aggregate
       servicer = find_servicer
-      transactions = filters(transaction_model.where(servicer: servicer)).to_a
-      print_transactions(transactions)
-      print_stats(transactions)
+      transactions = transaction_model.where(servicer: servicer)
+      aggregation = choose_aggregation
+
+      send(aggregation, transactions)
     end
 
     def find_servicer

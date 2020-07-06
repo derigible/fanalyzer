@@ -1,29 +1,21 @@
 # frozen_string_literal: true
 
-require_relative './concerns/transaction'
+require_relative 'concerns/sum'
+require_relative 'base'
 
 module Aggregations
-  class ByDate
-    include Aggregations::Concerns::Transaction
-    attr_accessor :proxy, :prompt
-
-    def initialize(db_proxy, tty_prompt)
-      @proxy = db_proxy
-      @prompt = tty_prompt
-    end
-
-    def run!
-      query
-
-      query while prompt.yes?('Do another query by date?')
-    end
-
+  class ByDate < Base
     private
 
-    def query
-      transactions = filters(transaction_model).to_a
-      print_transactions(transactions)
-      print_stats(transactions)
+    def rerun_prompt
+      'Do another aggregate by date?'
+    end
+
+    def aggregate
+      transactions = transaction_model
+      aggregation = choose_aggregation
+
+      send(aggregation, transactions)
     end
   end
 end

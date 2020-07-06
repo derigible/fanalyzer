@@ -46,7 +46,8 @@ class Application
 
   def aggregation
     result = prompt.select(
-      'Select aggregation filter option.', enum: '.'
+      'Select aggregation filter option (type to filter):',
+      enum: '.'
     ) do |menu|
       menu.choice 'By Category', :by_category
       menu.choice 'By Servicer', :by_servicer
@@ -63,7 +64,8 @@ class Application
 
   def compare
     result = prompt.select(
-      'Select comparison filter option.', enum: '.'
+      'Select comparison filter option (type to filter):',
+      enum: '.'
     ) do |menu|
       menu.choice 'By Category', :by_category
       menu.choice 'By Servicer', :by_servicer

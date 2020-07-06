@@ -46,7 +46,9 @@ module Comparisons
 
       def comparison_period
         use = prompt.select(
-          'Choose comparison period type:', enum: '.', per_page: 8
+          'Choose comparison period type (type to filter):',
+          enum: '.',
+          per_page: 8
         ) do |menu|
           menu.choice '7 days', :days_7
           menu.choice '30 days', :days_30

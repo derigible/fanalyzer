@@ -26,7 +26,7 @@ module Interactions
     def run!
       to_remove = prompt.select(
         'Choose label to remove (leave blank to cancel',
-        enum: '.'
+        filter: true
       ) do |menu|
         transaction.labels.each do |l|
           menu.choice l.name, l

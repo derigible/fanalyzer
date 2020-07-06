@@ -5,10 +5,16 @@ require 'active_support/core_ext/numeric/conversions'
 
 module Aggregations
   module Concerns
-    module Transaction
+    module Sum
       include Aggregations::Concerns::Date
 
       private
+
+      def sum(transactions)
+        transactions = filters(transactions).to_a
+        print_transactions(transactions)
+        print_stats(transactions)
+      end
 
       def filters(models)
         if prompt.yes?('Apply additional filters?')
