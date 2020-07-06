@@ -7,7 +7,7 @@ require_relative 'editors/transaction'
 require_relative 'queries/custom'
 require_relative 'aggregations/by_category'
 require_relative 'aggregations/by_servicer'
-require_relative 'aggregations/by_date'
+require_relative 'aggregations/all'
 require_relative 'comparisons/by_category'
 require_relative 'comparisons/by_servicer'
 require_relative 'comparisons/by_income'
@@ -51,7 +51,7 @@ class Application
     ) do |menu|
       menu.choice 'By Category', :by_category
       menu.choice 'By Servicer', :by_servicer
-      menu.choice 'By Date', :by_date
+      menu.choice 'All', :all
     end
     "Aggregations::#{result.to_s.camelize}".constantize.new(
       db_proxy, prompt

@@ -4,11 +4,11 @@ require_relative 'concerns/sum'
 require_relative 'base'
 
 module Aggregations
-  class ByDate < Base
+  class All < Base
     private
 
     def rerun_prompt
-      'Do another aggregate by date?'
+      'Do another aggregate for all?'
     end
 
     def aggregate

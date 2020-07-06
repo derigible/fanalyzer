@@ -13,7 +13,7 @@ module Aggregations
       def sum(transactions)
         transactions = filters(transactions).to_a
         print_transactions(transactions)
-        print_stats(transactions)
+        print_sum_stats(transactions)
       end
 
       def filters(models)
@@ -34,7 +34,7 @@ module Aggregations
         puts table.render(:ascii)
       end
 
-      def print_stats(transactions)
+      def print_sum_stats(transactions)
         puts
         total_table = TTY::Table.new(
           [
@@ -45,13 +45,13 @@ module Aggregations
             'Expense Total',
             'Total'
           ],
-          [transactions_stats(transactions)]
+          [sum_stats(transactions)]
         )
         puts total_table.render(:ascii)
       end
 
       # rubocop:disable Metrics/AbcSize
-      def transactions_stats(transactions)
+      def sum_stats(transactions)
         [
           transactions.count,
           transactions.count { |t| !t.is_debit },
