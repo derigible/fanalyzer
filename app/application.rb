@@ -13,7 +13,7 @@ require_relative 'comparisons/by_servicer'
 require_relative 'comparisons/by_income'
 require_relative 'comparisons/by_expenses'
 
-class Interactive
+class Application
   attr_reader :prompt, :db_proxy
   def initialize(database_proxy)
     @db_proxy = database_proxy
