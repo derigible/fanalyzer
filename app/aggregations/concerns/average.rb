@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
-require_relative 'date'
+require_relative 'average/daily'
 require 'active_support/core_ext/numeric/conversions'
 
 module Aggregations
   module Concerns
     module Average
+      include Aggregations::Concerns::Average::Daily
+
+      WEEKS_IN_YEAR = 52.1429
+
       private
 
       def average(transactions)
-        transactions = filters(transactions).to_a
-        print_transactions(transactions)
-      end
-
-      def filters(models)
         use = prompt.select(
           'Select period to calculate averages:',
           enum: '.'
@@ -25,30 +24,7 @@ module Aggregations
           menu.choice 'Yearly', :yearly
         end
 
-        send(use, models)
-      end
-
-      # output -
-      # daily average expenses (all)
-      # daily average income (all)
-      # daily average total (all)
-      # per week daily average expenses - |date-range|avg|
-      # per week daily average income - |date-range|avg|
-      # per week daily average total - |date-range|avg|
-      # per month daily average expenses - |date-range|avg|
-      # per month daily average income - |date-range|avg|
-      # per month daily average total - |date-range|avg|
-      # per quarter daily average expenses - |date-range|avg|
-      # per quarter daily average income - |date-range|avg|
-      # per quarter daily average total - |date-range|avg|
-      # per year daily average expenses - |date-range|avg|
-      # per year daily average income - |date-range|avg|
-      # per year daily average total - |date-range|avg|
-      def daily(models)
-        grouped = models.to_a.group_by(&:date)
-        calculate_initial_values(grouped)
-        print_groupings(grouped)
-        print_all_averages(calculate_average_across_all_groups(grouped))
+        send(use, transactions)
       end
 
       # output -
@@ -75,6 +51,7 @@ module Aggregations
         compute_yearly(models)
       end
 
+      # rubocop:disable Metrics/AbcSize
       def calculate_initial_values(groups)
         groups.each_key do |k|
           groups[k] = { values: groups[k] }
@@ -83,6 +60,8 @@ module Aggregations
           g[:income] = g[:values].reject(&:is_debit).sum(&:amount)
           g[:expenses] = g[:values].filter(&:is_debit).sum(&:amount)
           g[:total] = g[:income] - g[:expenses]
+          g[:count] = g[:values].size
+          g.delete :values
         end
       end
 
@@ -90,33 +69,63 @@ module Aggregations
         [
           grouped.values.sum { |g| g[:income] } / grouped.size,
           grouped.values.sum { |g| g[:expenses] } / grouped.size,
-          grouped.values.sum { |g| g[:total] } / grouped.size
+          grouped.values.sum { |g| g[:total] } / grouped.size,
+          grouped.values.sum { |g| g[:count] } / grouped.size
         ]
       end
+      # rubocop:enable Metrics/AbcSize
 
-      def print_all_averages(averages)
-        puts "Daily Income Average:   #{averages.first.to_s(:currency)}"
-        puts "Daily Expenses Average: #{averages[1].to_s(:currency)}"
-        puts "Daily Total Average:    #{averages.last.to_s(:currency)}"
+      def print_all_averages(averages, period)
+        puts "#{period} Income Average:   #{averages.first.to_s(:currency)}"
+        puts "#{period} Expenses Average: #{averages[1].to_s(:currency)}"
+        puts "#{period} Count Average:    #{averages.last}"
+        puts "#{period} Total Average:    #{averages[2].to_s(:currency)}"
       end
 
+      # rubocop:disable Metrics/AbcSize
       def print_groupings(groups)
         return if groups.empty?
 
+        puts 'Too many groupings, print first 150...' unless groups.size < 150
+
         table = TTY::Table.new(
-          %w[Range Income Expenses Total],
-          groups.keys.map do |k|
+          %w[Range Income Expenses Count Total],
+          groups.keys.slice(0, 150).map do |k|
             group = groups[k]
             [
               k,
               group[:income].to_s(:currency),
               group[:expenses].to_s(:currency),
+              group[:count],
               group[:total].to_s(:currency)
             ]
           end
         )
         puts table.render(:ascii)
       end
+
+      def print_range_table(grouped)
+        return if grouped.empty?
+
+        puts 'Too many groupings, print first 150...' unless groups.size < 150
+
+        table = TTY::Table.new(
+          ['Range', 'Ave Income', 'Ave Expenses', 'Ave Count', 'Ave Total'],
+          grouped.keys.slice(0, 150).map do |k|
+            group = grouped[k]
+            [
+              "#{k.last.strftime('%m/%d/%Y')} " \
+              "- #{k.first.strftime('%m/%d/%Y')}",
+              (group[:income] / group.size).to_s(:currency),
+              (group[:expenses] / group.size).to_s(:currency),
+              (group[:count] / group.size),
+              (group[:total] / group.size).to_s(:currency)
+            ]
+          end
+        )
+        puts table.render(:ascii)
+      end
+      # rubocop:enable Metrics/AbcSize
 
       def transaction_model
         @transaction_model ||= proxy.model(:transaction)
