@@ -3,10 +3,10 @@
 require_relative 'date'
 require 'active_support/core_ext/numeric/conversions'
 
-module Queries
+module Aggregations
   module Concerns
     module Transaction
-      include Queries::Concerns::Date
+      include Aggregations::Concerns::Date
 
       private
 

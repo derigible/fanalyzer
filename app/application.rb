@@ -5,9 +5,9 @@ require 'tty-table'
 require_relative 'uploaders/financial/csv'
 require_relative 'editors/transaction'
 require_relative 'queries/custom'
-require_relative 'queries/by_category'
-require_relative 'queries/by_servicer'
-require_relative 'queries/by_date'
+require_relative 'aggregations/by_category'
+require_relative 'aggregations/by_servicer'
+require_relative 'aggregations/by_date'
 require_relative 'comparisons/by_category'
 require_relative 'comparisons/by_servicer'
 require_relative 'comparisons/by_income'
@@ -24,8 +24,7 @@ class Application
     result = prompt.select('What would you like to do?') do |menu|
       menu.enum '.'
 
-      menu.choice 'Query', :query
-      menu.choice 'Compare', :compare
+      menu.choice 'Analyze', :analyze
       menu.choice 'Upload Data', :upload_data
       menu.choice 'Update/Browse Data', :update_data
     end
@@ -34,20 +33,40 @@ class Application
 
   private
 
-  def query
-    result = prompt.select('Select query option.', enum: '.') do |menu|
-      menu.choice 'Tranactions by Category', :by_category
-      menu.choice 'Tranactions by Servicer', :by_servicer
-      menu.choice 'Tranactions by Date', :by_date
-      menu.choice 'Custom', :custom
+  def analyze
+    result = prompt.select('What analysis you like to run?') do |menu|
+      menu.enum '.'
+
+      menu.choice 'Aggregate', :aggregation
+      menu.choice 'Compare', :compare
+      menu.choice 'Free form Query', :query
     end
-    "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
+    send(result)
+  end
+
+  def aggregation
+    result = prompt.select(
+      'Select aggregation filter option.', enum: '.'
+    ) do |menu|
+      menu.choice 'By Category', :by_category
+      menu.choice 'By Servicer', :by_servicer
+      menu.choice 'By Date', :by_date
+    end
+    "Aggregations::#{result.to_s.camelize}".constantize.new(
+      db_proxy, prompt
+    ).run!
+  end
+
+  def query
+    Queries::Custom.new(db_proxy, prompt).run!
   end
 
   def compare
-    result = prompt.select('Select comparison option.', enum: '.') do |menu|
-      menu.choice 'Transactions by Category', :by_category
-      menu.choice 'Transactions by Servicer', :by_servicer
+    result = prompt.select(
+      'Select comparison filter option.', enum: '.'
+    ) do |menu|
+      menu.choice 'By Category', :by_category
+      menu.choice 'By Servicer', :by_servicer
       menu.choice 'Income', :by_income
       menu.choice 'Expenses', :by_expenses
     end

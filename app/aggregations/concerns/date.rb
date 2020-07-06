@@ -4,7 +4,7 @@ require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/core_ext/date_and_time/calculations'
 
-module Queries
+module Aggregations
   module Concerns
     module Date
       private

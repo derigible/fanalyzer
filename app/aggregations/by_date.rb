@@ -2,9 +2,9 @@
 
 require_relative './concerns/transaction'
 
-module Queries
+module Aggregations
   class ByDate
-    include Queries::Concerns::Transaction
+    include Aggregations::Concerns::Transaction
     attr_accessor :proxy, :prompt
 
     def initialize(db_proxy, tty_prompt)
