@@ -17,14 +17,14 @@ module Queries
           'Previous statements:',
           enum: '.'
         ) do |menu|
-          menu.choice 'Create new statement', value: -1
+          menu.choice 'Create new statement', -1
           count = 0
           statements.each do |s|
-            menu.choice s, value: count
+            menu.choice s, count
             count += 1
           end
         end
-        sql = statements[statement[:value]] if statement[:value] > -1
+        sql = statements[statement] if statement > -1
       end
       if sql.nil?
         sql = prompt.ask('Enter sql:')

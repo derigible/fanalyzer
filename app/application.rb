@@ -24,10 +24,10 @@ class Application
     result = prompt.select('What would you like to do?') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Query', value: :query
-      menu.choice name: 'Compare', value: :compare
-      menu.choice name: 'Upload Data', value: :upload_data
-      menu.choice name: 'Update/Browse Data', value: :update_data
+      menu.choice 'Query', :query
+      menu.choice 'Compare', :compare
+      menu.choice 'Upload Data', :upload_data
+      menu.choice 'Update/Browse Data', :update_data
     end
     send(result)
   end
@@ -36,10 +36,10 @@ class Application
 
   def query
     result = prompt.select('Select query option.', enum: '.') do |menu|
-      menu.choice name: 'Tranactions by Category', value: :by_category
-      menu.choice name: 'Tranactions by Servicer', value: :by_servicer
-      menu.choice name: 'Tranactions by Date', value: :by_date
-      menu.choice name: 'Custom', value: :custom
+      menu.choice 'Tranactions by Category', :by_category
+      menu.choice 'Tranactions by Servicer', :by_servicer
+      menu.choice 'Tranactions by Date', :by_date
+      menu.choice 'Custom', :custom
     end
     "Queries::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!
   end
@@ -60,7 +60,7 @@ class Application
     result = prompt.select('Select type to upload.') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Financial CSV', value: :financial_csv
+      menu.choice 'Financial CSV', :financial_csv
     end
 
     type = result.to_s.split('_').map(&:camelize).join('::')
@@ -72,7 +72,7 @@ class Application
     result = prompt.select('Select type to edit.') do |menu|
       menu.enum '.'
 
-      menu.choice name: 'Transaction', value: :transaction
+      menu.choice 'Transaction', :transaction
     end
 
     "Editors::#{result.to_s.camelize}".constantize.new(db_proxy, prompt).run!

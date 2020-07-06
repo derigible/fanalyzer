@@ -37,7 +37,7 @@ module Interactions
     def file(value = nil)
       file_path = prompt.ask(
         "Enter the absolute path to the #{file_type}.",
-        value: value.nil? ? '' : value
+        value.nil? ? '' : value
       ) { |q| q.required true }
       if File.exist?(file_path)
         if File.file? file_path
