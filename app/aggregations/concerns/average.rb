@@ -104,15 +104,15 @@ module Aggregations
         puts table.render(:ascii)
       end
 
-      def print_range_table(grouped)
-        return if grouped.empty?
+      def print_range_table(groups)
+        return if groups.empty?
 
         puts 'Too many groupings, print first 150...' unless groups.size < 150
 
         table = TTY::Table.new(
           ['Range', 'Ave Income', 'Ave Expenses', 'Ave Count', 'Ave Total'],
-          grouped.keys.slice(0, 150).map do |k|
-            group = grouped[k]
+          groups.keys.slice(0, 150).map do |k|
+            group = groups[k]
             [
               "#{k.last.strftime('%m/%d/%Y')} " \
               "- #{k.first.strftime('%m/%d/%Y')}",
