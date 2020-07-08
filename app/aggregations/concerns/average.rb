@@ -37,7 +37,20 @@ module Aggregations
       # per month weekly average - |date-range|avg|
       # per quarter weekly average - |date-range|avg|
       # per year weekly average - |date-range|avg|
-      def weekly(models); end
+      def weekly(models)
+        grouped = models.to_a.group_by do |m|
+          m.date.beginning_of_week.to_date
+        end
+        calculate_initial_values(grouped)
+        print_groupings(grouped)
+        print_all_averages(
+          calculate_average_across_all_groups(grouped),
+          'Weekly'
+        )
+        do_range(grouped, :month)
+        do_range(grouped, :quarter)
+        do_range(grouped, :year)
+      end
 
       # output -
       # monthly average (all)
