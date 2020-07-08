@@ -16,14 +16,6 @@ module Aggregations
         print_sum_stats(transactions)
       end
 
-      def filters(models)
-        if prompt.yes?('Apply additional filters?')
-          date_filters(models)
-        else
-          models
-        end
-      end
-
       def print_transactions(transactions)
         return if transactions.empty?
 

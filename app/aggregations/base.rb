@@ -22,6 +22,14 @@ module Aggregations
 
     private
 
+    def filters(models)
+      if prompt.yes?('Apply additional filters?')
+        date_filters(models)
+      else
+        models
+      end
+    end
+
     def rerun_prompt
       raise NotImplementedError
     end

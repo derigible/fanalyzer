@@ -1,7 +1,26 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/numeric/conversions'
+require 'active_support/core_ext/integer/time'
 require 'active_support/core_ext/date_and_time/calculations'
+
+class Date
+  def quarter
+    (month / 3.0).ceil
+  end
+end
+
+class Integer
+  # Returns a Duration instance matching the number of quarters provided.
+  #
+  #   2.quarters # => 2 quarters
+  def quarters
+    ActiveSupport::Duration.months(self * 3)
+  end
+  # rubocop:disable Style/Alias
+  alias :quarter :quarters
+  # rubocop:enable Style/Alias
+end
 
 module Aggregations
   module Concerns
@@ -32,7 +51,7 @@ module Aggregations
         def do_weekly(grouped)
           return unless prompt.yes?('See daily averages per week?')
 
-          grouped_by_week = group_by_week(grouped)
+          grouped_by_week = group_by(grouped, :week, :cweek)
           print_range_table(grouped_by_week)
           do_monthly(grouped)
         end
@@ -40,7 +59,7 @@ module Aggregations
         def do_monthly(grouped)
           return unless prompt.yes?('See daily averages per month?')
 
-          grouped_by_month = group_by_month(grouped)
+          grouped_by_month = group_by(grouped, :month)
           print_range_table(grouped_by_month)
           do_quarterly(grouped)
         end
@@ -48,7 +67,7 @@ module Aggregations
         def do_quarterly(grouped)
           return unless prompt.yes?('See daily averages per quarter?')
 
-          grouped_by_quarter = group_by_quarter(grouped)
+          grouped_by_quarter = group_by(grouped, :quarter)
           print_range_table(grouped_by_quarter)
           do_yearly(grouped)
         end
@@ -56,17 +75,16 @@ module Aggregations
         def do_yearly(grouped)
           return unless prompt.yes?('See daily averages per year?')
 
-          grouped_by_year = group_by_year(grouped)
+          grouped_by_year = group_by(grouped, :year)
           print_range_table(grouped_by_year)
-          do_yearly(grouped)
         end
 
-        def group_by_week(grouped)
+        def group_by(grouped, type, date_accessor = type)
           sorted_grouped_keys = grouped.keys.sort
-          first_date, last_date = first_and_last_date(sorted_grouped_keys)
-          num_weeks = weeks_from_years_between(first_date, last_date)
-          num_weeks += last_date.cweek + (WEEKS_IN_YEAR - first_date.cweek)
-          make_groupings(num_weeks, grouped, sorted_grouped_keys, :weeks)
+          num_periods = number_periods_to_check(
+            sorted_grouped_keys, type, date_accessor
+          )
+          make_groupings(num_periods, grouped, sorted_grouped_keys, type)
         end
 
         def first_and_last_date(sorted_grouped_keys)
@@ -78,18 +96,39 @@ module Aggregations
 
         def make_groupings(num_periods, grouped, sorted_grouped_keys, type)
           # TODO: not performant, but small number of ranges so may not matter
-          (0..num_periods.floor).each_with_object({}) do |i, new_groupings|
-            range = i.send(type).ago.all_week
+          (0..num_periods.ceil).each_with_object({}) do |i, new_groupings|
+            range = make_range(i, type)
             sorted_grouped_keys.reverse.each do |sgk|
+              new_groupings[range] ||= {
+                income: 0,
+                expenses: 0,
+                count: 0,
+                total: 0,
+                num_periods: num_periods(range)
+              }
               break if range.first > sgk
               next if range.last < sgk
 
-              new_groupings[range] ||= {
-                income: 0, expenses: 0, count: 0, total: 0
-              }
               update_group(new_groupings[range], grouped[sgk])
             end
           end
+        end
+
+        def make_range(num, type)
+          num.send(type).ago.send("all_#{type}".to_sym)
+        end
+
+        def number_periods_to_check(keys, type, date_accessor = type)
+          period_constant = self.class.const_get(
+            "#{type.to_s.upcase}S_IN_YEAR".to_sym
+          )
+          first_date, last_date = first_and_last_date(keys)
+          num_periods_between = periods_from_years_between(
+            first_date, last_date, period_constant
+          )
+          num_periods_between + last_date.send(date_accessor) + (
+            period_constant - first_date.send(date_accessor)
+          )
         end
 
         def update_group(group, grouped)
@@ -99,9 +138,9 @@ module Aggregations
           group[:total] += grouped[:total]
         end
 
-        def weeks_from_years_between(first_date, last_date)
+        def periods_from_years_between(first_date, last_date, period_constant)
           if (last_date - first_date).is_a? ::Date
-            (last_date.year - first_date.year) * WEEKS_IN_YEAR
+            (last_date.year - first_date.year) * period_constant
           else
             0
           end

@@ -9,6 +9,9 @@ module Aggregations
       include Aggregations::Concerns::Average::Daily
 
       WEEKS_IN_YEAR = 52.1429
+      MONTHS_IN_YEAR = 12
+      QUARTERS_IN_YEAR = 4
+      YEARS_IN_YEAR = 0
 
       private
 
@@ -23,6 +26,8 @@ module Aggregations
           menu.choice 'Quarterly', :quarterly
           menu.choice 'Yearly', :yearly
         end
+
+        transactions = filters(transactions) unless use == :yearly
 
         send(use, transactions)
       end
@@ -116,16 +121,20 @@ module Aggregations
             [
               "#{k.last.strftime('%m/%d/%Y')} " \
               "- #{k.first.strftime('%m/%d/%Y')}",
-              (group[:income] / group.size).to_s(:currency),
-              (group[:expenses] / group.size).to_s(:currency),
-              (group[:count] / group.size),
-              (group[:total] / group.size).to_s(:currency)
+              (group[:income] / group[:num_periods]).to_s(:currency),
+              (group[:expenses] / group[:num_periods]).to_s(:currency),
+              (group[:count] / group[:num_periods]),
+              (group[:total] / group[:num_periods]).to_s(:currency)
             ]
           end
         )
         puts table.render(:ascii)
       end
       # rubocop:enable Metrics/AbcSize
+
+      def num_periods(range)
+        (range.last.to_date - range.first.to_date).to_i + 1
+      end
 
       def transaction_model
         @transaction_model ||= proxy.model(:transaction)
