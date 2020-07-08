@@ -52,7 +52,7 @@ module Aggregations
         end
 
         def do_range(grouped, type, date_accessor = type)
-          return unless prompt.yes?("See daily averages per #{type}}?")
+          return unless prompt.yes?("See daily averages per #{type}?")
 
           grouped_by = group_by(grouped, type, date_accessor)
           print_range_table(grouped_by)
@@ -99,8 +99,12 @@ module Aggregations
           num_periods_between = periods_from_years_between(
             first_date, last_date, period_constant
           )
-          num_periods_between + last_date.send(date_accessor) + (
-            period_constant - first_date.send(date_accessor)
+          periods_from_dates(
+            first_date,
+            last_date,
+            num_periods_between,
+            date_accessor,
+            period_constant
           )
         end
 
@@ -112,11 +116,29 @@ module Aggregations
         end
 
         def periods_from_years_between(first_date, last_date, period_constant)
-          if (last_date - first_date).is_a? ::Date
-            (last_date.year - first_date.year) * period_constant
-          else
-            0
+          return unless (last_date - first_date).is_a? ::Date
+
+          (last_date.year - first_date.year) * period_constant
+        end
+
+        def periods_from_dates(
+          first_date,
+          last_date,
+          num_periods_between,
+          date_accessor,
+          period_constant
+        )
+          last_period_num = last_date.send(date_accessor)
+          first_period_num = first_date.send(date_accessor)
+
+          if num_periods_between.nil? && last_date.year == first_date.year
+            return last_period_num - first_period_num
           end
+
+          num_periods_between = 0 if num_periods_between.nil?
+          num_periods_between + last_period_num + (
+            period_constant - first_period_num
+          )
         end
       end
     end
