@@ -45,38 +45,17 @@ module Aggregations
             calculate_average_across_all_groups(grouped),
             'Daily'
           )
-          do_weekly(grouped)
+          do_range(grouped, :week, :cweek)
+          do_range(grouped, :month)
+          do_range(grouped, :quarter)
+          do_range(grouped, :year)
         end
 
-        def do_weekly(grouped)
-          return unless prompt.yes?('See daily averages per week?')
+        def do_range(grouped, type, date_accessor = type)
+          return unless prompt.yes?("See daily averages per #{type}}?")
 
-          grouped_by_week = group_by(grouped, :week, :cweek)
-          print_range_table(grouped_by_week)
-          do_monthly(grouped)
-        end
-
-        def do_monthly(grouped)
-          return unless prompt.yes?('See daily averages per month?')
-
-          grouped_by_month = group_by(grouped, :month)
-          print_range_table(grouped_by_month)
-          do_quarterly(grouped)
-        end
-
-        def do_quarterly(grouped)
-          return unless prompt.yes?('See daily averages per quarter?')
-
-          grouped_by_quarter = group_by(grouped, :quarter)
-          print_range_table(grouped_by_quarter)
-          do_yearly(grouped)
-        end
-
-        def do_yearly(grouped)
-          return unless prompt.yes?('See daily averages per year?')
-
-          grouped_by_year = group_by(grouped, :year)
-          print_range_table(grouped_by_year)
+          grouped_by = group_by(grouped, type, date_accessor)
+          print_range_table(grouped_by)
         end
 
         def group_by(grouped, type, date_accessor = type)
@@ -85,13 +64,6 @@ module Aggregations
             sorted_grouped_keys, type, date_accessor
           )
           make_groupings(num_periods, grouped, sorted_grouped_keys, type)
-        end
-
-        def first_and_last_date(sorted_grouped_keys)
-          [
-            sorted_grouped_keys.first,
-            sorted_grouped_keys.last
-          ]
         end
 
         def make_groupings(num_periods, grouped, sorted_grouped_keys, type)
@@ -122,7 +94,8 @@ module Aggregations
           period_constant = self.class.const_get(
             "#{type.to_s.upcase}S_IN_YEAR".to_sym
           )
-          first_date, last_date = first_and_last_date(keys)
+          first_date = keys.first
+          last_date = keys.last
           num_periods_between = periods_from_years_between(
             first_date, last_date, period_constant
           )
