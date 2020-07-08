@@ -54,6 +54,8 @@ module Aggregations
         def do_range(grouped, type, date_accessor = type)
           return unless prompt.yes?("See daily averages per #{type}?")
 
+          sparse_preference
+
           grouped_by = group_by(grouped, type, date_accessor)
           print_range_table(grouped_by)
         end
@@ -71,19 +73,26 @@ module Aggregations
           (0..num_periods.ceil).each_with_object({}) do |i, new_groupings|
             range = make_range(i, type)
             sorted_grouped_keys.reverse.each do |sgk|
-              new_groupings[range] ||= {
-                income: 0,
-                expenses: 0,
-                count: 0,
-                total: 0,
-                num_periods: num_periods(range)
-              }
+              make_new_grouping(new_groupings, range) unless @sparse_preference
+
               break if range.first > sgk
               next if range.last < sgk
+
+              make_new_grouping(new_groupings, range) if @sparse_preference
 
               update_group(new_groupings[range], grouped[sgk])
             end
           end
+        end
+
+        def make_new_grouping(new_groupings, range)
+          new_groupings[range] ||= {
+            income: 0,
+            expenses: 0,
+            count: 0,
+            total: 0,
+            num_periods: num_days_in_range(range)
+          }
         end
 
         def make_range(num, type)

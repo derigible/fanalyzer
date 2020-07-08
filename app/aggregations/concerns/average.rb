@@ -132,7 +132,7 @@ module Aggregations
       end
       # rubocop:enable Metrics/AbcSize
 
-      def num_periods(range)
+      def num_days_in_range(range)
         (range.last.to_date - range.first.to_date).to_i + 1
       end
 
