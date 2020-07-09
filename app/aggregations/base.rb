@@ -12,7 +12,6 @@ module Aggregations
     def initialize(db_proxy, tty_prompt)
       @proxy = db_proxy
       @prompt = tty_prompt
-      @sparse_preference = true
     end
 
     def run!
@@ -43,12 +42,6 @@ module Aggregations
         menu.choice 'Sum', :sum
         menu.choice 'Average', :average
       end
-    end
-
-    def sparse_preference
-      @sparse_preference = prompt.yes?(
-        'Use sparse output? (will not fill in periods missing values)'
-      )
     end
   end
 end
