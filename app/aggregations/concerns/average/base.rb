@@ -210,7 +210,7 @@ module Aggregations
 
           table = TTY::Table.new(
             %w[Range Income Expenses Count Total],
-            groups.keys.slice(0, 150).map do |k|
+            groups.keys.slice(0, 150).sort.reverse.map do |k|
               group = groups[k]
               [
                 format_group_key(k),
@@ -231,7 +231,7 @@ module Aggregations
 
           table = TTY::Table.new(
             ['Range', 'Ave Income', 'Ave Expenses', 'Ave Count', 'Ave Total'],
-            groups.keys.slice(0, 150).map do |k|
+            groups.keys.slice(0, 150).sort_by(&:first).reverse.map do |k|
               group = groups[k]
               [
                 "#{k.last.strftime(FMT_TIME_PATTERN)} " \
