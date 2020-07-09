@@ -35,5 +35,8 @@ Style/DoubleNegation:
 Style/FormatStringToken:
   Enabled: false
 
+Style/Alias:
+  Enabled: false
+
 Metrics/ParameterLists:
   Enabled: false

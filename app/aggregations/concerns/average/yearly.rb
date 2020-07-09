@@ -5,21 +5,17 @@ require_relative 'base'
 module Aggregations
   module Concerns
     module Average
-      class Weekly < Base
+      class Yearly < Base
         private
 
-        def do_ranges
-          do_range(grouped, :month)
-          do_range(grouped, :quarter)
-          do_range(grouped, :year)
-        end
+        def do_ranges; end
 
         def ave_kind
-          :week
+          :year
         end
 
         def printable_ave_kind
-          'Weekly'
+          'Yearly'
         end
       end
     end

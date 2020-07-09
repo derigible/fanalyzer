@@ -3,6 +3,9 @@
 require 'active_support/core_ext/numeric/conversions'
 require_relative 'average/daily'
 require_relative 'average/weekly'
+require_relative 'average/monthly'
+require_relative 'average/quarterly'
+require_relative 'average/yearly'
 
 module Aggregations
   module Concerns
@@ -43,17 +46,21 @@ module Aggregations
       # monthly average (all)
       # per quarter monthly average - |date-range|avg|
       # per year monthly average - |date-range|avg|
-      def monthly(models); end
+      def monthly(models)
+        Monthly.new(models, prompt).run!
+      end
 
       # output -
       # quarterly average (all)
       # per year quarterly average - |date-range|avg|
-      def quarterly(models); end
+      def quarterly(models)
+        Quarterly.new(models, prompt).run!
+      end
 
       # output -
       # yearly average (all)
       def yearly(models)
-        compute_yearly(models)
+        Yearly.new(models, prompt).run!
       end
 
       def transaction_model
