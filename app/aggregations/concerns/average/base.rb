@@ -181,7 +181,7 @@ module Aggregations
             grouped.values.sum { |g| g[:income] } / num_periods,
             grouped.values.sum { |g| g[:expenses] } / num_periods,
             grouped.values.sum { |g| g[:total] } / num_periods,
-            grouped.values.sum { |g| g[:count] } / num_periods,
+            grouped.values.sum { |g| g[:count] } / num_periods.to_f,
             num_periods + 1, # add one to offset for 0 based indexing
             range
           ]
@@ -190,7 +190,7 @@ module Aggregations
         def print_all_averages(averages, period)
           puts "#{period} Income Average:             #{averages.first.to_s(:currency)}"
           puts "#{period} Expenses Average:           #{averages[1].to_s(:currency)}"
-          puts "#{period} Count Average:              #{averages[3]}"
+          puts "#{period} Count Average:              #{averages[3].to_s(:rounded, precision: 2)}"
           puts "#{period} Total Average:              #{averages[2].to_s(:currency)}"
           puts "Number of #{period.downcase} periods in range: #{averages[4]}"
           puts "Start date and End date of range: #{averages.last.first.strftime(FMT_TIME_PATTERN)} - #{averages.last.last.strftime(FMT_TIME_PATTERN)}"
