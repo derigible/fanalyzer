@@ -2,6 +2,7 @@
 
 require_relative './concerns/date'
 require_relative '../filters/label'
+require_relative '../filters/category'
 require 'active_support/core_ext/numeric/conversions'
 require 'active_support/core_ext/array/access'
 
@@ -10,6 +11,7 @@ Comparison = Struct.new(:description, :transactions, :sum, :iteration)
 module Comparisons
   class Base
     include Comparisons::Concerns::Date
+    include Filters::Category
     include Filters::Label
     attr_accessor :proxy, :prompt
 
@@ -31,6 +33,7 @@ module Comparisons
     end
 
     def filters(models)
+      models = category_filters(models)
       label_filters(models)
     end
 

@@ -3,11 +3,15 @@
 require_relative '../interactions/review_transactions'
 require_relative '../filters/label'
 require_relative '../filters/date'
+require_relative '../filters/category'
+require_relative '../filters/servicer'
 
 module Editors
   class Transaction
+    include Filters::Category
     include Filters::Date
     include Filters::Label
+    include Filters::Servicer
 
     REGEX = /\A[+-]?\d+(\.[\d]+)?\z/.freeze
     PAGE_SIZE = 100
@@ -66,6 +70,8 @@ module Editors
       models = transaction_model
       if prompt.yes?('Apply filters?')
         models = date_filters(models)
+        models = category_filters(models)
+        models = servicer_filters(models)
         label_filters(models)
       else
         models

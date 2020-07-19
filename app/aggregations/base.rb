@@ -4,11 +4,13 @@ require_relative 'concerns/sum'
 require_relative 'concerns/average'
 require_relative '../filters/label'
 require_relative '../filters/date'
+require_relative '../filters/category'
 
 module Aggregations
   class Base
     include Aggregations::Concerns::Sum
     include Aggregations::Concerns::Average
+    include Filters::Category
     include Filters::Date
     include Filters::Label
     attr_accessor :proxy, :prompt
@@ -29,6 +31,7 @@ module Aggregations
     def filters(models)
       if prompt.yes?('Apply additional filters?')
         models = date_filters(models)
+        models = category_filters(models)
         label_filters(models)
       else
         models

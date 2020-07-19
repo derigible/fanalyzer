@@ -1,20 +1,18 @@
 # frozen_string_literal: true
 
-require 'active_support/core_ext/object/blank'
-
 module Filters
   module Label
     private
 
     def label_filters(models)
       if prompt.yes?('Filter by label?')
-        filter!(models)
+        filter_by_label!(models)
       else
         models
       end
     end
 
-    def filter!(models, additional = false)
+    def filter_by_label!(models, additional = false)
       use = prompt.select(
         'Choose label filtering strategy to apply:',
         enum: '.',
@@ -44,7 +42,7 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter! models.exclude(labels: label_model.where(id: excluding)), true
+      filter_by_label! models.exclude(labels: label_model.where(id: excluding)), true
     end
 
     def exclude_without_labels(models)
@@ -56,7 +54,7 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter! models.where(labels: label_model.where(id: excluding)), true
+      filter_by_label! models.where(labels: label_model.where(id: excluding)), true
     end
 
     def include_labels(models)
@@ -67,7 +65,7 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter! models.where(labels: label_model.where(id: including)), true
+      filter_by_label! models.where(labels: label_model.where(id: including)), true
     end
 
     def label_model
