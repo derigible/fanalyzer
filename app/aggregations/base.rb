@@ -28,7 +28,7 @@ module Aggregations
 
     def filters(models)
       if prompt.yes?('Apply additional filters?')
-        date_filters(models)
+        models = date_filters(models)
         label_filters(models)
       else
         models

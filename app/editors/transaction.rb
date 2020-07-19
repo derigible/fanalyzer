@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require_relative '../interactions/review_transactions'
+require_relative '../filters/label'
+require_relative '../filters/date'
 
 module Editors
   class Transaction
+    include Filters::Date
+    include Filters::Label
+
     REGEX = /\A[+-]?\d+(\.[\d]+)?\z/.freeze
     PAGE_SIZE = 100
 
@@ -45,7 +50,8 @@ module Editors
     end
 
     def browse
-      transactions = transaction_model.limit(PAGE_SIZE, page * PAGE_SIZE).to_a
+      models = filtered_models
+      transactions = models.limit(PAGE_SIZE, page * PAGE_SIZE).to_a
       result = prompt.select('Select your transaction:', per_page: 15) do |menu|
         transactions.each do |t|
           menu.choice tableize(t), t
@@ -54,6 +60,16 @@ module Editors
       end
 
       handle_browse_result result
+    end
+
+    def filtered_models
+      models = transaction_model
+      if prompt.yes?('Apply filters?')
+        models = date_filters(models)
+        label_filters(models)
+      else
+        models
+      end
     end
 
     def tableize(transaction)

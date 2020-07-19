@@ -41,10 +41,10 @@ module Filters
         'Choose labels to exclude (press enter when all selected)'
       ) do |menu|
         label_names.each do |l|
-          menu.choice l
+          menu.choice l[:name], l[:id]
         end
       end
-      filter! models.exclude(labels: label_model.where(name: excluding)), true
+      filter! models.exclude(labels: label_model.where(id: excluding)), true
     end
 
     def exclude_without_labels(models)
@@ -53,10 +53,10 @@ module Filters
         '(press enter when all selected)'
       ) do |menu|
         label_names.each do |l|
-          menu.choice l
+          menu.choice l[:name], l[:id]
         end
       end
-      filter! models.where(labels: label_model.where(name: excluding)), true
+      filter! models.where(labels: label_model.where(id: excluding)), true
     end
 
     def include_labels(models)
@@ -64,10 +64,10 @@ module Filters
         'Choose labels to include (press enter when all selected)'
       ) do |menu|
         label_names.each do |l|
-          menu.choice l
+          menu.choice l[:name], l[:id]
         end
       end
-      filter! models.where(labels: label_model.where(name: including)), true
+      filter! models.where(labels: label_model.where(id: including)), true
     end
 
     def label_model
@@ -75,7 +75,9 @@ module Filters
     end
 
     def label_names
-      @label_names ||= label_model.select(:name).map(&:name)
+      @label_names ||= label_model.map do |l|
+        { name: l.name, id: l.id }
+      end
     end
   end
 end
