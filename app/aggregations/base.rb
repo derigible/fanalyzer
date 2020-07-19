@@ -2,15 +2,15 @@
 
 require_relative 'concerns/sum'
 require_relative 'concerns/average'
-require_relative 'concerns/label'
-require_relative 'concerns/date'
+require_relative '../filters/label'
+require_relative '../filters/date'
 
 module Aggregations
   class Base
     include Aggregations::Concerns::Sum
     include Aggregations::Concerns::Average
-    include Aggregations::Concerns::Date
-    include Aggregations::Concerns::Label
+    include Filters::Date
+    include Filters::Label
     attr_accessor :proxy, :prompt
 
     def initialize(db_proxy, tty_prompt)

@@ -1,30 +1,20 @@
 # frozen_string_literal: true
 
-require_relative './concerns/transaction'
+require_relative 'base'
 
 module Comparisons
-  class ByCategory
-    include Comparisons::Concerns::Transaction
-    attr_accessor :proxy, :prompt
-
-    def initialize(db_proxy, tty_prompt)
-      @proxy = db_proxy
-      @prompt = tty_prompt
-    end
-
+  class ByCategory < Base
     def run!
-      compare
+      run_compare
 
-      compare while prompt.yes?('Do another compare by category?')
+      run_compare while prompt.yes?('Do another compare by category?')
     end
 
     private
 
-    def compare
+    def run_compare
       category = find_category
-      compared = comparisons(transaction_model.where(category: category)).to_a
-      print_compared(compared)
-      print_differences(compared)
+      compare(transaction_model.where(category: category))
     end
 
     def find_category
