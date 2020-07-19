@@ -62,7 +62,7 @@ class DatabaseProxy
   def model(model)
     conn
     require_relative "models/#{model}"
-    "Models::#{model.to_s.camelize}".constantize
+    model.to_s.camelize.to_s.constantize
   end
 
   def load_models

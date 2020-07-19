@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-module Models
-  class Upload < Sequel::Model
-  end
+class Upload < Sequel::Model
 end
 
 Models::Upload.plugin :timestamps, create: :timestamp, update: :timestamp

@@ -26,7 +26,7 @@ module DatabaseConnections
     private
 
     def appended_db
-      @db_name.split('.').last != '.db' ? @db_name + '.db' : @db_name
+      @db_name.split('.').last != '.sqlite3' ? @db_name + '.sqlite3' : @db_name
     end
   end
 end

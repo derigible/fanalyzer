@@ -2,6 +2,8 @@
 
 require_relative 'concerns/sum'
 require_relative 'concerns/average'
+require_relative 'concerns/label'
+require_relative 'concerns/date'
 
 module Aggregations
   class Base
@@ -25,6 +27,7 @@ module Aggregations
     def filters(models)
       if prompt.yes?('Apply additional filters?')
         date_filters(models)
+        label_filters(models)
       else
         models
       end

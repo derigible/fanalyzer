@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'date'
 require 'active_support/core_ext/numeric/conversions'
 
 module Aggregations
   module Concerns
     module Sum
-      include Aggregations::Concerns::Date
-
       private
 
       def sum(transactions)

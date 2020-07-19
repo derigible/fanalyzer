@@ -12,7 +12,7 @@ module Aggregations
       def date_filters(models)
         if prompt.yes?('Filter by date?')
           use = prompt.select(
-            'Choose date filtering strategy (type to filter):',
+            'Choose date filtering strategy:',
             enum: '.',
             per_page: 7
           ) do |menu|
@@ -23,7 +23,10 @@ module Aggregations
             menu.choice 'This quarter', :this_quarter
             menu.choice 'Year to date', :year_to_date
             menu.choice 'Custom', :custom
+            menu.choice 'Cancel', :cancel
           end
+          return models if use == :cancel
+
           send(use, models)
         else
           models

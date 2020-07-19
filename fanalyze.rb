@@ -3,6 +3,7 @@
 require 'byebug'
 require_relative 'db/database_proxy'
 require_relative 'app/application'
+require_relative 'app/console'
 
 # Main entry to analyzer
 class Fanalyze < Thor
@@ -75,6 +76,12 @@ class Fanalyze < Thor
   desc 'interact', 'run the interactive program'
   def interact
     Application.new(proxy).run!
+  end
+
+  desc 'console', 'run an irb console with the models loaded'
+  def console
+    proxy
+    Console.new.run!
   end
 
   private
