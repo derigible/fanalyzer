@@ -18,6 +18,7 @@ GEM
       equatable (~> 0.6)
       tty-color (~> 0.5)
     pg (1.2.3)
+    rake (13.0.1)
     sequel (5.33.0)
     sqlite3 (1.4.2)
     strings (0.1.8)
@@ -57,7 +58,9 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   byebug
+  minitest
   pg
+  rake
   sequel
   sqlite3
   thor

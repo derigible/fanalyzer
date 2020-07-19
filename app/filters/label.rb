@@ -42,7 +42,9 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter_by_label! models.exclude(labels: label_model.where(id: excluding)), true
+      filter_by_label!(
+        models.exclude(labels: label_model.where(id: excluding)), true
+      )
     end
 
     def exclude_without_labels(models)
@@ -54,7 +56,9 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter_by_label! models.where(labels: label_model.where(id: excluding)), true
+      filter_by_label!(
+        models.where(labels: label_model.where(id: excluding)), true
+      )
     end
 
     def include_labels(models)
@@ -65,7 +69,9 @@ module Filters
           menu.choice l[:name], l[:id]
         end
       end
-      filter_by_label! models.where(labels: label_model.where(id: including)), true
+      filter_by_label!(
+        models.where(labels: label_model.where(id: including)), true
+      )
     end
 
     def label_model
