@@ -35,6 +35,48 @@ module Aggregations
 
         send(use, models)
       end
+
+      def exclude_labels(models)
+        excluding = prompt.multi_select(
+          'Choose labels to exclude (press enter when all selected)'
+        ) do |menu|
+          label_names.each do |l|
+            menu.choice l
+          end
+        end
+        filter! models.exclude(labels: label_model.where(name: excluding)), true
+      end
+
+      def exclude_without_labels(models)
+        excluding = prompt.multi_select(
+          'Choose labels to exclude if label missing ' \
+          '(press enter when all selected)'
+        ) do |menu|
+          label_names.each do |l|
+            menu.choice l
+          end
+        end
+        filter! models.where(labels: label_model.where(name: excluding)), true
+      end
+
+      def include_labels(models)
+        including = prompt.multi_select(
+          'Choose labels to include (press enter when all selected)'
+        ) do |menu|
+          label_names.each do |l|
+            menu.choice l
+          end
+        end
+        filter! models.where(labels: label_model.where(name: including)), true
+      end
+
+      def label_model
+        @label_model ||= proxy.model(:label)
+      end
+
+      def label_names
+        @label_names ||= label_model.select(:name).map(&:name)
+      end
     end
   end
 end

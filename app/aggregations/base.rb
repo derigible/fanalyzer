@@ -9,6 +9,8 @@ module Aggregations
   class Base
     include Aggregations::Concerns::Sum
     include Aggregations::Concerns::Average
+    include Aggregations::Concerns::Date
+    include Aggregations::Concerns::Label
     attr_accessor :proxy, :prompt
 
     def initialize(db_proxy, tty_prompt)

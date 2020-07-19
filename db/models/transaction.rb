@@ -28,7 +28,7 @@ class Transaction < Sequel::Model
     t.labels = t.labels.map(&:name).join(',')
     t.upload_id = upload_id
     t.is_debit = is_debit ? 'debit' : 'credit'
-    t.to_h.values
+    struct_to_row(t)
   end
 
   def table_keys
@@ -40,6 +40,23 @@ class Transaction < Sequel::Model
       else
         k
       end
-    end.map(&:to_s).map(&:titleize)
+    end.map(&:to_s).map(&:titleize) + ['Labels']
+  end
+
+  private
+
+  def struct_to_row(row)
+    [
+      row.id,
+      row.date,
+      row.description,
+      row.amount,
+      row.type,
+      row.notes,
+      row.category,
+      row.servicer,
+      row.upload_id,
+      row.labels
+    ]
   end
 end
