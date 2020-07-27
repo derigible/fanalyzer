@@ -14,18 +14,17 @@ require_relative '../../extractors/financial/csv'
 module Uploaders
   module Financial
     class Csv
-      attr_reader :prompt, :db_proxy, :upload_id
+      attr_reader :prompt, :db_proxy, :upload_id, :opts
 
-      def initialize(database_proxy, tty_prompt)
+      def initialize(database_proxy, tty_prompt, **opts)
         @db_proxy = database_proxy
         @prompt = tty_prompt
+        @opts = opts
       end
 
       def run!
         upload_id = new_upload
-        header_selector = Interactions::SelectHeaders.new(
-          header_mapping_model, prompt
-        )
+        header_selector = select_headers
         headers = header_selector.run!
         date_format = select_date_format(header_selector.id)
         transactions, servicers, categories = extract_financial_data_from_csv(
@@ -88,11 +87,12 @@ module Uploaders
         transactions.each do |t|
           next if t.servicer.id == 'remove'
 
-          puts "Creating new transaction #{count}"
+          puts "Creating new transaction #{count}" unless opts[:quiet]
 
           create_transaction(t, upload_id)
           count += 1
         end
+        puts "Created #{count} tranactions" if opts[:quiet]
       end
 
       def create_transaction(transaction, upload_id)
@@ -129,30 +129,46 @@ module Uploaders
       end
 
       def select_file
-        Interactions::SelectFile.new(prompt, 'csv').run!
+        opts[:csv_file] || Interactions::SelectFile.new(prompt, 'csv').run!
       end
 
       def select_source
-        Interactions::SelectSource.new(prompt, source_model).run!
+        opts[:source] || Interactions::SelectSource.new(
+          prompt, source_model
+        ).run!
       end
 
       def select_date_format(headers_id)
-        Interactions::SelectDateFormat.new(header_mapping_model, prompt).run!(
+        opts[:date_format] || Interactions::SelectDateFormat.new(
+          header_mapping_model, prompt
+        ).run!(
           headers_id
         )
       end
 
+      def select_headers
+        opts[:headers] || Interactions::SelectHeaders.new(
+          header_mapping_model, prompt
+        )
+      end
+
       def detect_new_transactions(transactions)
-        puts
-        print 'Checking if transactions already present'
+        print_detect_message
         transactions.each_with_object([]) do |t, new_transactions|
-          print '.'
+          print '.' unless opts[:quiet]
           next unless transaction_model[
             date: t.date, amount: t.amount, is_debit: t.is_debit
           ].nil?
 
           new_transactions << t
         end
+      end
+
+      def print_detect_message
+        return if opts[:quiet]
+
+        puts
+        print 'Checking if transactions already present'
       end
 
       def header_mapping_model
