@@ -20,7 +20,7 @@ class DatabaseProxy
                   else
                     DatabaseConnections::Postgres.new(db_name)
                   end
-    load_models
+    load_models if db_exists?
   end
 
   def create_database(options)

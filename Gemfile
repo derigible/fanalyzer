@@ -14,4 +14,5 @@ gem 'tty-table'
 
 group :test do
   gem 'minitest'
+  gem 'minitest-hooks'
 end

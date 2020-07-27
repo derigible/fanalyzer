@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'byebug'
+require 'tty-prompt'
+require 'tty-table'
 require_relative 'db/database_proxy'
 require_relative 'app/application'
 require_relative 'app/console'
@@ -75,7 +77,7 @@ class Fanalyze < Thor
 
   desc 'interact', 'run the interactive program'
   def interact
-    Application.new(proxy).run!
+    Application.new(proxy, TTY::Prompt.new).run!
   end
 
   desc 'console', 'run an irb console with the models loaded'

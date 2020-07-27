@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'tty-prompt'
-require 'tty-table'
 require_relative 'uploaders/financial/csv'
 require_relative 'editors/transaction'
 require_relative 'queries/custom'
@@ -15,9 +13,9 @@ require_relative 'comparisons/by_expenses'
 
 class Application
   attr_reader :prompt, :db_proxy
-  def initialize(database_proxy)
+  def initialize(database_proxy, tty_prompt)
     @db_proxy = database_proxy
-    @prompt = TTY::Prompt.new
+    @prompt = tty_prompt
   end
 
   def run!

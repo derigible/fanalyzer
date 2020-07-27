@@ -2,8 +2,8 @@
 
 require 'minitest_helper'
 
-class TestMeme < Minitest::Test
-  def test_that_kitty_can_eat
+class TestAverages < FanalyzeTest
+  def test_daily_daily
     assert true
   end
 end
