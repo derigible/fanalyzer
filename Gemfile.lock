@@ -41,7 +41,7 @@ GEM
       tty-screen (~> 0.2)
       unicode_utils (~> 1.4.0)
       verse (~> 0.4)
-    tzinfo (1.2.7)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     unicode-display_width (1.1.3)
     unicode_utils (1.4.0)
